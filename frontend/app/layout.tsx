@@ -1,0 +1,33 @@
+import './globals.css'
+import Sidebar from '@/components/Sidebar'
+
+export const metadata = {
+  title: 'Margino OS',
+  description: 'Procurement Engine',
+}
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <html lang="en">
+      <head>
+        {/* Font Awesome */}
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+      </head>
+      <body className="bg-slate-100 flex h-screen overflow-hidden text-slate-800 m-0">
+        
+        {/* Lateral Sidebar */}
+        <Sidebar />
+
+        {/* Main area where pages are loaded */}
+        <div className="flex-1 flex flex-col h-screen min-w-0 overflow-y-auto">
+          {children}
+        </div>
+
+      </body>
+    </html>
+  )
+}
