@@ -13,13 +13,14 @@ interface Supplier {
   insightDescription: string;
 }
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
 export default function SuppliersPage() {
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   // Fetch supplier data from the backend API
   useEffect(() => {
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
     fetch(`${API_URL}/api/suppliers`)
       .then((res) => res.json())

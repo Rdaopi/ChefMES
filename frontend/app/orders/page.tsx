@@ -16,13 +16,15 @@ interface OrdersPipeline {
   approved: Order[];
 }
 
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
 export default function OrdersPage() {
   const [orders, setOrders] = useState<OrdersPipeline>({ pending: [], approved: [] });
   const [isLoading, setIsLoading] = useState(true);
 
   // Fetch data from the backend API
   useEffect(() => {
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
     fetch(`${API_URL}/api/orders`)
       .then((res) => res.json())

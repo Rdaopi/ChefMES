@@ -12,12 +12,14 @@ interface MenuItem {
   trend: string;
 }
 
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
 export default function MenuEngineeringPage() {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
     fetch(`${API_URL}/api/menus`)
       .then((res) => res.json())

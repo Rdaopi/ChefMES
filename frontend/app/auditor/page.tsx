@@ -12,14 +12,14 @@ interface Invoice {
   actionStatus: 'blocked' | 'cleared';
 }
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
 export default function InvoiceAuditorPage() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   // Fetch data from the backend API
   useEffect(() => {
-
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
     fetch(`${API_URL}/api/invoices`)
       .then((res) => res.json())

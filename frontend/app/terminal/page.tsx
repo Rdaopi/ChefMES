@@ -13,13 +13,14 @@ interface TerminalItem {
   status: string;
 }
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
 export default function TradingTerminalPage() {
   const [items, setItems] = useState<TerminalItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-    
+
     fetch(`${API_URL}/api/terminal`)
       .then((res) => res.json())
       .then((data) => {
@@ -36,9 +37,8 @@ export default function TradingTerminalPage() {
     const handleAction = async (item: TerminalItem) => {
     const actionType = item.status === 'Opportunity' ? 'buy-dip' : 'switch-vendor';
     const amount = item.status === 'Opportunity' ? 45.50 : 0;
-
     try {
-        const res = await fetch('http://localhost:8000/api/actions', {
+        const res = await fetch(`${API_URL}/api/actions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ actionType, amount })
