@@ -69,7 +69,7 @@ export default function DishDetailPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {dish.ingredients?.map((ing: any, i: number) => (
+                {dish.ingredients?.map((ing: { name: string; qty: number; unitCost: number; total: number }, i: number) => (
                   <tr key={i} className="hover:bg-slate-50 transition-colors">
                     <td className="py-4 font-bold text-slate-700">{ing.name}</td>
                     <td className="py-4 text-right text-sm text-slate-500">{ing.qty}</td>
@@ -86,7 +86,7 @@ export default function DishDetailPage() {
           <div className="p-6 bg-blue-50/50 border-t border-blue-100">
             <h2 className="text-sm font-black text-blue-900 uppercase tracking-wider mb-4">Estimated Operating Costs</h2>
             <div className="space-y-3">
-              {dish.estimatedCosts.map((cost: any, i: number) => (
+              {dish.estimatedCosts.map((cost: { type: string; value: string; cost: number }, i: number) => (
                 <div key={i} className="flex justify-between items-center text-sm">
                   <span className="text-blue-800 font-medium"><i className="fas fa-clock mr-2 text-blue-400"></i>{cost.type} ({cost.value})</span>
                   <span className="font-black text-blue-900">€{cost.cost.toFixed(2)}</span>

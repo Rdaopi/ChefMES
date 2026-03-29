@@ -20,7 +20,6 @@ export default function TradingTerminalPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-
     fetch(`${API_URL}/api/terminal`)
       .then((res) => res.json())
       .then((data) => {
@@ -33,26 +32,26 @@ export default function TradingTerminalPage() {
       });
   }, []);
 
-  // Click handlers -> To implement as separate component
-    const handleAction = async (item: TerminalItem) => {
+  const handleAction = async (item: TerminalItem) => {
+    if (item.status !== 'Opportunity' && item.status !== 'Warning') return;
+
     const actionType = item.status === 'Opportunity' ? 'buy-dip' : 'switch-vendor';
     const amount = item.status === 'Opportunity' ? 45.50 : 0;
+    
     try {
-        const res = await fetch(`${API_URL}/api/actions`, {
+      const res = await fetch(`${API_URL}/api/actions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ actionType, amount })
-        });
+        body: JSON.stringify({ actionType, amount, itemId: item.id }) 
+      });
 
-        if (res.ok) {
-            // Optional: reloads the page
-            window.location.reload(); 
-            // Note: In a real app we would use a global state or SWR / React Query
-        }
+      if (res.ok) {
+        window.location.reload(); 
+      }
     } catch (err) {
-        console.error("Action failed", err);
+      console.error("Action failed", err);
     }
-    };
+  };
 
   return (
     <div className="flex-1 flex flex-col h-full bg-slate-50 p-4 md:p-8 overflow-y-auto">
@@ -119,7 +118,12 @@ export default function TradingTerminalPage() {
                       </span>
                     </td>
                     <td className="px-6 py-5 whitespace-nowrap">
-                      <button className={`text-white text-xs font-bold py-2 px-4 rounded-lg shadow-sm transition-all transform group-hover:-translate-y-0.5 ${item.status === 'Opportunity' ? 'bg-emerald-600 hover:bg-emerald-700' : item.status === 'Warning' ? 'bg-red-600 hover:bg-red-700' : 'bg-slate-400 hover:bg-slate-500 cursor-not-allowed'}`}>
+                      
+                      <button 
+                        onClick={() => handleAction(item)}
+                        disabled={item.status !== 'Opportunity' && item.status !== 'Warning'}
+                        className={`text-white text-xs font-bold py-2 px-4 rounded-lg shadow-sm transition-all transform group-hover:-translate-y-0.5 ${item.status === 'Opportunity' ? 'bg-emerald-600 hover:bg-emerald-700' : item.status === 'Warning' ? 'bg-red-600 hover:bg-red-700' : 'bg-slate-400 cursor-not-allowed'}`}
+                      >
                         <i className={`fas ${item.status === 'Opportunity' ? 'fa-shopping-cart' : item.status === 'Warning' ? 'fa-exchange-alt' : 'fa-minus'} mr-1`}></i>
                         {item.status === 'Opportunity' ? 'Buy Dip' : item.status === 'Warning' ? 'Switch Vendor' : 'Hold'}
                       </button>

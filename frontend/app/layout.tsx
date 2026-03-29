@@ -2,7 +2,7 @@ import './globals.css'
 import Sidebar from '@/components/Sidebar'
 
 export const metadata = {
-  title: 'Margino OS',
+  title: 'Chef MES - Procurement Orchestrator',
   description: 'Procurement Engine',
 }
 
