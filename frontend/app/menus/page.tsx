@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface MenuItem {
   id: string;
@@ -12,15 +13,14 @@ interface MenuItem {
   trend: string;
 }
 
-
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 export default function MenuEngineeringPage() {
+  const router = useRouter(); // 2. Inizializza il router
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-
     fetch(`${API_URL}/api/menus`)
       .then((res) => res.json())
       .then((data) => {
@@ -36,10 +36,10 @@ export default function MenuEngineeringPage() {
   // Helper per i colori in base alla categoria del menu engineering
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'Star': return 'bg-yellow-100 text-yellow-800 border-yellow-300'; // High Profit, High Popularity
-      case 'Puzzle': return 'bg-blue-100 text-blue-800 border-blue-300';     // High Profit, Low Popularity
-      case 'Plowhorse': return 'bg-purple-100 text-purple-800 border-purple-300'; // Low Profit, High Popularity
-      case 'Dog': return 'bg-red-100 text-red-800 border-red-300';           // Low Profit, Low Popularity
+      case 'Star': return 'bg-yellow-100 text-yellow-800 border-yellow-300'; 
+      case 'Puzzle': return 'bg-blue-100 text-blue-800 border-blue-300';     
+      case 'Plowhorse': return 'bg-purple-100 text-purple-800 border-purple-300'; 
+      case 'Dog': return 'bg-red-100 text-red-800 border-red-300';           
       default: return 'bg-slate-100 text-slate-800 border-slate-300';
     }
   };
@@ -82,7 +82,12 @@ export default function MenuEngineeringPage() {
                 <tr><td colSpan={6} className="text-center py-12 text-slate-400 font-medium">No menu data available.</td></tr>
               ) : (
                 menuItems.map((item) => (
-                  <tr key={item.id} className="hover:bg-slate-50 transition-colors">
+                  // 3. Aggiunto onClick e cursor-pointer alla riga
+                  <tr 
+                    key={item.id} 
+                    onClick={() => router.push(`/menus/${item.id}`)}
+                    className="hover:bg-slate-100 transition-colors cursor-pointer"
+                  >
                     <td className="px-6 py-5 font-bold text-slate-800">{item.dishName}</td>
                     <td className="px-6 py-5 text-sm text-slate-500">{item.category}</td>
                     <td className="px-6 py-5 text-sm font-medium text-slate-700">€ {item.sellingPrice.toFixed(2)}</td>

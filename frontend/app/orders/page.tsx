@@ -67,7 +67,7 @@ export default function OrdersPage() {
         <div className="w-80 flex flex-col shrink-0">
           <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wide mb-4">Auto-Routed by AI</h3>
           {isLoading ? <p className="text-sm text-slate-400 font-medium">Loading pipeline...</p> : 
-            orders.approved.map((order) => (
+            orders?.approved.map((order) => (
               <div key={order.id} className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm border-t-4 border-t-blue-500 mb-4 transition-transform hover:-translate-y-1">
                 <div className="flex justify-between items-start mb-2">
                   <span className="text-xs font-bold text-slate-400">{order.id}</span>

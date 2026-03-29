@@ -51,11 +51,15 @@ app.get('/api/stats', (req: any, res: any) => {
 
 // 2. Live Orders (App /orders)
 app.get('/api/orders', (req: any, res: any) => {
-    res.json([
-        { id: 'ORD-992', title: 'Fresh Produce Weekly', amount: 450.00, supplier: 'Ortofrutta Trentina', status: 'scanning', date: 'Oggi' },
-        { id: 'ORD-991', title: 'Dairy & Cheese', amount: 1200.00, supplier: 'Centrale del Latte', status: 'sent', date: 'Ieri' },
-        { id: 'ORD-990', title: 'Meat & Poultry Supply', amount: 3450.00, supplier: 'Global Carni SPA', status: 'delivered', date: '2 giorni fa' }
-    ]);
+    res.json({
+        pending: [
+            { id: 'ORD-992', title: 'Fresh Produce Weekly', amount: 450.00, supplier: 'Ortofrutta Trentina', status: 'scanning', date: 'Today' }
+        ],
+        approved: [
+            { id: 'ORD-991', title: 'Dairy & Cheese', amount: 1200.00, supplier: 'Centrale del Latte', status: 'sent', date: 'Yesterday' },
+            { id: 'ORD-990', title: 'Meat & Poultry Supply', amount: 3450.00, supplier: 'Global Carni SPA', status: 'delivered', date: '2 days ago' }
+        ]
+    });
 });
 
 // 3. Menu Engineering (App /menus)
@@ -176,7 +180,7 @@ app.post('/api/actions', (req: any, res: any) => {
 });
 
 // --- SERVER INITIALIZATION ---
-const PORT = process.env.PORT || 8000;
+const PORT = Number(process.env.PORT) || 8000;
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Backend is running on port ${PORT}`);
     console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
