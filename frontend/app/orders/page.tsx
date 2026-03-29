@@ -22,7 +22,9 @@ export default function OrdersPage() {
 
   // Fetch data from the backend API
   useEffect(() => {
-    fetch('http://localhost:8000/api/orders')
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
+    fetch(`${API_URL}/api/orders`)
       .then((res) => res.json())
       .then((data) => {
         setOrders(data);

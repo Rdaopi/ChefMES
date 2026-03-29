@@ -19,7 +19,9 @@ export default function SuppliersPage() {
 
   // Fetch supplier data from the backend API
   useEffect(() => {
-    fetch('http://localhost:8000/api/suppliers')
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
+    fetch(`${API_URL}/api/suppliers`)
       .then((res) => res.json())
       .then((data) => {
         setSuppliers(data);

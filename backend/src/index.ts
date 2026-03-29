@@ -111,8 +111,8 @@ app.post('/api/actions', (req: any, res: any) => {
 });
 
 // --- SERVER INITIALIZATION ---
-const PORT = 8000;
+const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
     console.log(`Backend is running on port ${PORT}`);
-    console.log(`Environment: Development / Demo Mode`);
+    console.log(`Environment: ${process.env.NODE_ENV || 'Development'}`);
 });

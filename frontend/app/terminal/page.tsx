@@ -18,7 +18,9 @@ export default function TradingTerminalPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:8000/api/terminal')
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+    
+    fetch(`${API_URL}/api/terminal`)
       .then((res) => res.json())
       .then((data) => {
         setItems(data);

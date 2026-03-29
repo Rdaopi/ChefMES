@@ -17,7 +17,9 @@ export default function MenuEngineeringPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:8000/api/menus')
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
+    fetch(`${API_URL}/api/menus`)
       .then((res) => res.json())
       .then((data) => {
         setMenuItems(data);
