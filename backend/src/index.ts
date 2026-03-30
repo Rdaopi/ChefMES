@@ -3,8 +3,25 @@ import cors from 'cors';
 
 const app = express();
 
-// Middleware
-app.use(cors());
+// --- 1. CORS CONFIGURATION ---
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:5173',
+  process.env.FRONTEND_URL
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // Permetti richieste senza origin (es. Postman) o se l'origin è nella nostra lista
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Bloccato dalle policy CORS'));
+    }
+  },
+  credentials: true // Fondamentale se in futuro gestirai i login (cookie/token)
+}));
+
 app.use(express.json()); // Required to parse POST request bodies
 
 // --- IN-MEMORY DATABASE (Simulation) ---
@@ -44,13 +61,11 @@ let terminalItems = [
 
 // --- API ENDPOINTS ---
 
-// 1. Statistics (Dashboard Header)
-app.get('/api/stats', (req: any, res: any) => {
+app.get('/api/stats', (req, res) => {
     res.json(globalStats);
 });
 
-// 2. Live Orders (App /orders)
-app.get('/api/orders', (req: any, res: any) => {
+app.get('/api/orders', (req, res) => {
     res.json({
         pending: [
             { id: 'ORD-992', title: 'Fresh Produce Weekly', amount: 450.00, supplier: 'Ortofrutta Trentina', status: 'scanning', date: 'Today' }
@@ -62,8 +77,7 @@ app.get('/api/orders', (req: any, res: any) => {
     });
 });
 
-// 3. Menu Engineering (App /menus)
-app.get('/api/menus', (req: any, res: any) => {
+app.get('/api/menus', (req, res) => {
     res.json([
         { id: 'm1', dishName: 'Truffle Risotto', category: 'Main Course', productionCost: 9.50, sellingPrice: 28.00, profitMargin: 18.50, status: 'Star', trend: 'stable' },
         { id: 'm2', dishName: 'Wagyu Burger', category: 'Main Course', productionCost: 11.20, sellingPrice: 24.00, profitMargin: 12.80, status: 'Dog', trend: 'down' },
@@ -72,11 +86,10 @@ app.get('/api/menus', (req: any, res: any) => {
     ]);
 });
 
-// 4. Single Dish Drill-Down (App /menus/[id])
-app.get('/api/menus/:id', (req: any, res: any) => {
+app.get('/api/menus/:id', (req, res) => {
     const dishId = req.params.id;
 
-    const dishDetails: Record<string, any> = {
+    const dishDetails = {
         'm1': {
             id: 'm1', dishName: 'Truffle Risotto', category: 'Main Course', sellingPrice: 28.00, totalCost: 9.50, profitMargin: 18.50,
             ingredients: [
@@ -138,30 +151,25 @@ app.get('/api/menus/:id', (req: any, res: any) => {
     }
 });
 
-// 5. Invoice Auditor (App /auditor or /invoices)
-// We map both routes to the same array to prevent 404 errors
 const invoicesData = [
     { id: 'INV-2026/04', supplier: 'Global Carni SPA', amount: 3450.00, aiVerification: 'Salami Slicing Detected (+€45.20)', verificationStatus: 'error', actionTaken: 'Payment Blocked', actionStatus: 'blocked' },
     { id: 'INV-2026/05', supplier: 'Cantine Riunite', amount: 1200.00, aiVerification: 'Matches Contracts', verificationStatus: 'success', actionTaken: 'Cleared for Payment', actionStatus: 'cleared' }
 ];
-app.get('/api/invoices', (req: any, res: any) => res.json(invoicesData));
-app.get('/api/auditor', (req: any, res: any) => res.json(invoicesData));
+app.get('/api/invoices', (req, res) => res.json(invoicesData));
+app.get('/api/auditor', (req, res) => res.json(invoicesData));
 
-// 6. Suppliers (App /suppliers)
-app.get('/api/suppliers', (req: any, res: any) => {
+app.get('/api/suppliers', (req, res) => {
     res.json([
         { id: 'sup-1', name: 'Bianchi Srl', category: 'Beverage & Spirits', score: 98, status: 'excellent', icon: 'fa-building', insightTitle: 'Highly Reliable', insightDescription: '0 invoice errors in the last 12 months.' },
         { id: 'sup-2', name: 'Rossi Distribuzione', category: 'Oils & Condiments', score: 42, status: 'warning', icon: 'fa-industry', insightTitle: 'Warning', insightDescription: 'Frequent unannounced price hikes.' }
     ]);
 });
 
-// 7. Trading Terminal (App /terminal)
-app.get('/api/terminal', (req: any, res: any) => {
+app.get('/api/terminal', (req, res) => {
     res.json(terminalItems);
 });
 
-// 8. Terminal Actions (Simulation logic)
-app.post('/api/actions', (req: any, res: any) => {
+app.post('/api/actions', (req, res) => {
     const { actionType, itemId } = req.body;
 
     if (actionType === 'buy-dip') {
@@ -179,9 +187,12 @@ app.post('/api/actions', (req: any, res: any) => {
     res.json({ success: true, message: 'Stats updated successfully', currentStats: globalStats });
 });
 
-// --- SERVER INITIALIZATION ---
+// --- 2. SERVER INITIALIZATION ---
 const PORT = Number(process.env.PORT) || 8000;
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Backend is running on port ${PORT}`);
     console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
 });
+
+// --- 3. EXPORT PER SERVERLESS  ---
+export default app;
