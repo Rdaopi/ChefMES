@@ -5,7 +5,8 @@ export default function TerminalStats() {
   const [stats, setStats] = useState<any>(null);
 
   useEffect(() => {
-    fetch('http://localhost:8000/api/stats')
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+    fetch(`${API_URL}/api/stats`)
       .then(res => res.json())
       .then(data => setStats(data));
   }, []);
