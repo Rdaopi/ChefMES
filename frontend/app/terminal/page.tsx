@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import TerminalStats from '@/components/TerminalStats';
+import { useTranslations } from '@/components/LanguageProvider';
 
 interface TerminalItem {
   id: string;
@@ -53,16 +54,18 @@ export default function TradingTerminalPage() {
     }
   };
 
+  const { t } = useTranslations();
+
   return (
     <div className="flex-1 flex flex-col h-full bg-slate-50 p-4 md:p-8 overflow-y-auto">
       {/* Header */}
       <header className="mb-8 flex justify-between items-center shrink-0">
         <div>
-          <h2 className="text-2xl font-black text-slate-800 tracking-tight">Trading Terminal</h2>
-          <p className="text-slate-500 text-sm mt-1">Live market monitoring for recurring ingredients</p>
+          <h2 className="text-2xl font-black text-slate-800 tracking-tight">{t('tradingTerminal')}</h2>
+          <p className="text-slate-500 text-sm mt-1">{t('liveMarketMonitoring')}</p>
         </div>
         <span className="px-3 py-1.5 bg-red-100 text-red-600 text-xs font-bold rounded-full animate-pulse border border-red-200 shadow-sm">
-          <i className="fas fa-circle text-[8px] mr-2"></i>LIVE MARKET
+          <i className="fas fa-circle text-[8px] mr-2"></i>{t('liveMarket')}
         </span>
       </header>
       
@@ -75,26 +78,26 @@ export default function TradingTerminalPage() {
           <table className="min-w-full divide-y divide-slate-200">
             <thead className="bg-slate-50">
               <tr>
-                <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-wider">Ingredient</th>
-                <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-wider">Supplier</th>
-                <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-wider">Contract Price</th>
-                <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-wider">Live Market</th>
-                <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-wider">Trend</th>
-                <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-wider">Action</th>
+                <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-wider">{t('ingredient')}</th>
+                <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-wider">{t('supplier')}</th>
+                <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-wider">{t('contractPrice')}</th>
+                <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-wider">{t('liveMarketPrice')}</th>
+                <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-wider">{t('trend')}</th>
+                <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-wider">{t('status')}</th>
+                <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-wider">{t('action')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 bg-white">
               {isLoading ? (
                 <tr>
                   <td colSpan={7} className="text-center py-12 text-slate-400 font-medium">
-                    <i className="fas fa-spinner fa-spin mr-2"></i>Loading live market data...
+                    <i className="fas fa-spinner fa-spin mr-2"></i>{t('loadingLiveMarketData')}
                   </td>
                 </tr>
               ) : items.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="text-center py-12 text-slate-400 font-medium">
-                    No data available.
+                    {t('noDataAvailable')}
                   </td>
                 </tr>
               ) : (
@@ -125,7 +128,7 @@ export default function TradingTerminalPage() {
                         className={`text-white text-xs font-bold py-2 px-4 rounded-lg shadow-sm transition-all transform group-hover:-translate-y-0.5 ${item.status === 'Opportunity' ? 'bg-emerald-600 hover:bg-emerald-700' : item.status === 'Warning' ? 'bg-red-600 hover:bg-red-700' : 'bg-slate-400 cursor-not-allowed'}`}
                       >
                         <i className={`fas ${item.status === 'Opportunity' ? 'fa-shopping-cart' : item.status === 'Warning' ? 'fa-exchange-alt' : 'fa-minus'} mr-1`}></i>
-                        {item.status === 'Opportunity' ? 'Buy Dip' : item.status === 'Warning' ? 'Switch Vendor' : 'Hold'}
+                        {item.status === 'Opportunity' ? t('buyDip') : item.status === 'Warning' ? t('switchVendor') : t('hold')}
                       </button>
                     </td>
                   </tr>

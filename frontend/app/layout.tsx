@@ -1,5 +1,6 @@
 import './globals.css'
 import Sidebar from '@/components/Sidebar'
+import { LanguageProvider } from '@/components/LanguageProvider'
 
 export const metadata = {
   title: 'Chef MES - Procurement Orchestrator',
@@ -18,15 +19,15 @@ export default function RootLayout({
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
       </head>
       <body className="bg-slate-100 flex h-screen overflow-hidden text-slate-800 m-0">
-        
-        {/* Lateral Sidebar */}
-        <Sidebar />
+        <LanguageProvider>
+          {/* Lateral Sidebar */}
+          <Sidebar />
 
-        {/* Main area where pages are loaded */}
-        <div className="flex-1 flex flex-col h-screen min-w-0 overflow-y-auto">
-          {children}
-        </div>
-
+          {/* Main area where pages are loaded */}
+          <div className="flex-1 flex flex-col h-screen min-w-0 overflow-y-auto">
+            {children}
+          </div>
+        </LanguageProvider>
       </body>
     </html>
   )

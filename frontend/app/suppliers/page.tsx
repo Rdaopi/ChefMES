@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { useTranslations } from '@/components/LanguageProvider';
 
 // TypeScript interfaces
 interface Supplier {
@@ -31,17 +32,19 @@ export default function SuppliersPage() {
       .catch((error) => console.error("Connection error:", error));
   }, []);
 
+  const { t } = useTranslations();
+
   return (
     <div className="flex-1 flex flex-col h-full min-w-0 bg-slate-50">
       <header className="h-16 bg-white border-b border-slate-200 flex items-center px-8 shrink-0">
-        <h2 className="text-lg font-bold text-slate-800">AI Vendor Management</h2>
+        <h2 className="text-lg font-bold text-slate-800">{t('aiVendorManagement')}</h2>
       </header>
       
       <main className="flex-1 overflow-y-auto p-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           
           {isLoading ? (
-            <p className="text-slate-400 font-medium">Loading vendor scores...</p>
+            <p className="text-slate-400 font-medium">{t('loadingVendorScores')}</p>
           ) : (
             suppliers.map((supplier) => (
               <div 

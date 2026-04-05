@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from '@/components/LanguageProvider';
 
 interface MenuItem {
   id: string;
@@ -44,20 +45,22 @@ export default function MenuEngineeringPage() {
     }
   };
 
+  const { t } = useTranslations();
+
   return (
     <div className="flex-1 flex flex-col h-full bg-slate-50 p-8">
       <header className="mb-8">
-        <h2 className="text-2xl font-black text-slate-800 tracking-tight">Menu Engineering</h2>
-        <p className="text-slate-500 text-sm mt-1">Real-time dish profitability based on live food cost</p>
+        <h2 className="text-2xl font-black text-slate-800 tracking-tight">{t('menuEngineering')}</h2>
+        <p className="text-slate-500 text-sm mt-1">{t('realTimeDishProfitability')}</p>
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
         <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <p className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-1">Avg Food Cost</p>
+          <p className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-1">{t('avgFoodCost')}</p>
           <p className="text-2xl font-black text-slate-800">28.4% <span className="text-emerald-500 text-sm ml-2"><i className="fas fa-arrow-down"></i> 1.2%</span></p>
         </div>
         <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <p className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-1">Items at Risk</p>
+          <p className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-1">{t('itemsAtRisk')}</p>
           <p className="text-2xl font-black text-red-600">3</p>
         </div>
       </div>
@@ -67,19 +70,19 @@ export default function MenuEngineeringPage() {
           <table className="min-w-full divide-y divide-slate-200">
             <thead className="bg-slate-50">
               <tr>
-                <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-wider">Dish Name</th>
-                <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-wider">Category</th>
-                <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-wider">Selling Price</th>
-                <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-wider">Live Food Cost</th>
-                <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-wider">Gross Margin</th>
-                <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-wider">Matrix Status</th>
+                <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-wider">{t('dishName')}</th>
+                <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-wider">{t('category')}</th>
+                <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-wider">{t('sellingPrice')}</th>
+                <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-wider">{t('liveFoodCost')}</th>
+                <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-wider">{t('grossMargin')}</th>
+                <th className="px-6 py-4 text-left text-xs font-black text-slate-400 uppercase tracking-wider">{t('matrixStatus')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 bg-white">
               {isLoading ? (
-                <tr><td colSpan={6} className="text-center py-12 text-slate-400 font-medium"><i className="fas fa-spinner fa-spin mr-2"></i>Calculating live margins...</td></tr>
+                <tr><td colSpan={6} className="text-center py-12 text-slate-400 font-medium"><i className="fas fa-spinner fa-spin mr-2"></i>{t('calculatingLiveMargins')}</td></tr>
               ) : menuItems.length === 0 ? (
-                <tr><td colSpan={6} className="text-center py-12 text-slate-400 font-medium">No menu data available.</td></tr>
+                <tr><td colSpan={6} className="text-center py-12 text-slate-400 font-medium">{t('noDataAvailable')}</td></tr>
               ) : (
                 menuItems.map((item) => (
                   // 3. Aggiunto onClick e cursor-pointer alla riga

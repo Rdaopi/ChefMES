@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { useTranslations } from '@/components/LanguageProvider';
 
 // TypeScript interfaces
 interface Invoice {
@@ -30,10 +31,12 @@ export default function InvoiceAuditorPage() {
       .catch((error) => console.error("Connection error:", error));
   }, []);
 
+  const { t } = useTranslations();
+
   return (
     <div className="flex-1 flex flex-col h-full min-w-0 bg-slate-50">
       <header className="h-16 bg-white border-b border-slate-200 flex items-center px-8 shrink-0">
-        <h2 className="text-lg font-bold text-slate-800">XML Invoice Auditor (Clawback Engine)</h2>
+        <h2 className="text-lg font-bold text-slate-800">{t('invoiceAuditorTitle')}</h2>
       </header>
       
       <main className="flex-1 overflow-y-auto p-8">
@@ -41,17 +44,17 @@ export default function InvoiceAuditorPage() {
           <table className="min-w-full divide-y divide-slate-200">
             <thead className="bg-slate-50">
               <tr>
-                <th className="px-6 py-4 text-left text-xs font-black text-slate-500 uppercase tracking-wider">Invoice ID</th>
-                <th className="px-6 py-4 text-left text-xs font-black text-slate-500 uppercase tracking-wider">Supplier</th>
-                <th className="px-6 py-4 text-left text-xs font-black text-slate-500 uppercase tracking-wider">Billed Amount</th>
-                <th className="px-6 py-4 text-left text-xs font-black text-slate-500 uppercase tracking-wider">AI Verification</th>
-                <th className="px-6 py-4 text-left text-xs font-black text-slate-500 uppercase tracking-wider">Action Taken</th>
+                <th className="px-6 py-4 text-left text-xs font-black text-slate-500 uppercase tracking-wider">{t('invoiceId')}</th>
+                <th className="px-6 py-4 text-left text-xs font-black text-slate-500 uppercase tracking-wider">{t('supplier')}</th>
+                <th className="px-6 py-4 text-left text-xs font-black text-slate-500 uppercase tracking-wider">{t('billedAmount')}</th>
+                <th className="px-6 py-4 text-left text-xs font-black text-slate-500 uppercase tracking-wider">{t('aiVerification')}</th>
+                <th className="px-6 py-4 text-left text-xs font-black text-slate-500 uppercase tracking-wider">{t('actionTaken')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {isLoading ? (
                 <tr>
-                  <td colSpan={5} className="text-center py-8 text-slate-400 font-medium">Scanning XML invoices...</td>
+                  <td colSpan={5} className="text-center py-8 text-slate-400 font-medium">{t('scanningXmlInvoices')}</td>
                 </tr>
               ) : (
                 invoices.map((invoice) => (
