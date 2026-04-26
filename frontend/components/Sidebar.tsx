@@ -29,6 +29,10 @@ export default function Sidebar() {
                 <i className="fas fa-file-invoice-dollar w-6"></i>
                 <span className="font-medium">{t('invoiceAuditor')}</span>
             </Link>
+            <Link href="/invoice-import" className="flex items-center px-4 py-3 hover:bg-slate-800 hover:text-white rounded-xl transition-colors">
+                <i className="fas fa-file-import w-6"></i>
+                <span className="font-medium">Invoice Import</span>
+            </Link>
             <Link href="/suppliers" className="flex items-center px-4 py-3 hover:bg-slate-800 hover:text-white rounded-xl transition-colors">
                 <i className="fas fa-users w-6"></i>
                 <span className="font-medium">{t('suppliers')}</span>

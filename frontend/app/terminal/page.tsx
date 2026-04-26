@@ -2,8 +2,9 @@
 import { useEffect, useState } from 'react';
 import TerminalStats from '@/components/TerminalStats';
 import { useTranslations } from '@/components/LanguageProvider';
+import { loadInvoiceState, TradingItem } from '@/lib/invoiceStorage';
 
-interface TerminalItem {
+interface TerminalItem extends TradingItem {
   id: string;
   ingredient: string;
   supplier: string;
@@ -19,8 +20,17 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 export default function TradingTerminalPage() {
   const [items, setItems] = useState<TerminalItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [invoiceSource, setInvoiceSource] = useState<string | null>(null);
 
   useEffect(() => {
+    const stored = loadInvoiceState();
+    if (stored?.tradingItems?.length) {
+      setItems(stored.tradingItems);
+      setInvoiceSource(`Imported from ${stored.fileName}`);
+      setIsLoading(false);
+      return;
+    }
+
     fetch(`${API_URL}/api/terminal`)
       .then((res) => res.json())
       .then((data) => {
@@ -69,6 +79,12 @@ export default function TradingTerminalPage() {
         </span>
       </header>
       
+      {invoiceSource ? (
+        <div className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-emerald-800 shadow-sm">
+          <strong className="font-semibold">Invoice data loaded:</strong> {invoiceSource}
+        </div>
+      ) : null}
+
       {/* Cards Component */}
       <TerminalStats />
 
