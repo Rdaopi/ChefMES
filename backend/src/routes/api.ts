@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { globalStats, menusList, ordersData, suppliersList, terminalItems } from '../data/mock-DB.js';
+import { globalStats, menusList, ordersData, suppliersList, terminalItems } from '../data/mock-db.js';
 import { uploadInvoice, getInvoices, getInvoiceDetails } from '../controllers/invoiceController.js';
 import { authenticate } from '../middleware/auth.js';
 
