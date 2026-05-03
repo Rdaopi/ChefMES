@@ -6,6 +6,8 @@ services:
       - "8000:8000"
     environment:
       - NODE_ENV=development
+    env_file:
+      - ./backend/.env
     volumes:
       - ./backend:/app
       - /app/node_modules
@@ -16,19 +18,9 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
     volumes:
       - ./frontend:/app
       - /app/node_modules
     depends_on:
       - backend
-
-  # Prep for PostgreSQL (commented out for now, can be enabled when ready to integrate)
-  # db:
-  #   image: postgres:15
-  #   environment:
-  #     POSTGRES_USER: root
-  #     POSTGRES_PASSWORD: password
-  #     POSTGRES_DB: margino
-  #   ports:
-  #     - "5432:5432"

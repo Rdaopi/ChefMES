@@ -1,101 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+
 import { ParsedInvoice, TradingItem, loadInvoiceState, saveInvoiceState, clearInvoiceState } from '@/lib/invoiceStorage';
-
-interface InvoiceLine {
-  id: string;
-  description: string;
-  quantity: number;
-  unit: string;
-  unitPrice: number;
-  totalPrice: number;
-  vatRate: number;
-}
-
-const randomBetween = (min: number, max: number) => Math.random() * (max - min) + min;
-const formatCurrency = (value: number) => `€ ${value.toFixed(2)}`;
-
-const getElementText = (parent: Element | null, tagName: string) => {
-  const element = parent?.getElementsByTagName(tagName)[0] ?? null;
-  return element?.textContent?.trim() ?? '';
-};
-
-const findElements = (doc: Document, localName: string) => {
-  const found = Array.from(doc.getElementsByTagNameNS('*', localName));
-  if (found.length > 0) {
-    return found;
-  }
-  return Array.from(doc.getElementsByTagName(localName));
-};
-
-const deriveTradingItems = (lines: InvoiceLine[], supplierName: string): TradingItem[] => {
-  return lines.map((line) => {
-    const contractPrice = parseFloat((line.unitPrice * randomBetween(0.9, 1.2)).toFixed(2));
-    const livePrice = parseFloat((contractPrice * randomBetween(0.85, 1.15)).toFixed(2));
-    const diff = livePrice - contractPrice;
-    const trendDirection = diff > 0.2 ? 'up' : diff < -0.2 ? 'down' : 'stable';
-    const status = trendDirection === 'up' ? 'Warning' : trendDirection === 'down' ? 'Opportunity' : 'Hold';
-
-    return {
-      id: line.id,
-      ingredient: line.description,
-      supplier: supplierName || 'Inferred Supplier',
-      contractPrice: contractPrice || line.unitPrice || 1.0,
-      livePrice: livePrice || contractPrice || line.unitPrice || 1.0,
-      trend: trendDirection === 'up' ? 'Rising cost' : trendDirection === 'down' ? 'Price dip' : 'Stable',
-      trendDirection,
-      status,
-    };
-  });
-};
-
-const parseInvoiceXml = (xmlText: string): ParsedInvoice => {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(xmlText, 'application/xml');
-  const parseError = doc.querySelector('parsererror');
-  if (parseError) {
-    throw new Error('Invalid XML');
-  }
-
-  const invoiceNumber = getElementText(doc.documentElement, 'Numero') || getElementText(doc.documentElement, 'IdCodice') || 'Unknown';
-  const invoiceDate = getElementText(doc.documentElement, 'Data') || 'Unknown';
-  const totalAmount = getElementText(doc.documentElement, 'ImportoTotaleDocumento') || 'Unknown';
-
-  const supplierName = getElementText(doc.documentElement, 'Denominazione') ||
-    getElementText(doc.documentElement, 'CedentePrestatore') ||
-    getElementText(doc.documentElement, 'CessionarioCommittente') ||
-    'Unknown Supplier';
-
-  const lineElements = findElements(doc, 'DettaglioLinee');
-
-  const lines = lineElements.map((lineElement, index) => {
-    const description = getElementText(lineElement, 'Descrizione') || 'Unknown item';
-    const quantity = Number(getElementText(lineElement, 'Quantita')) || Number(getElementText(lineElement, 'QuantitaOraria')) || 1;
-    const unit = getElementText(lineElement, 'UnitaMisura') || 'ea';
-    const unitPrice = Number(getElementText(lineElement, 'PrezzoUnitario')) || 0;
-    const totalPrice = Number(getElementText(lineElement, 'PrezzoTotale')) || 0;
-    const vatRate = Number(getElementText(lineElement, 'AliquotaIVA')) || 0;
-
-    return {
-      id: `${index + 1}`,
-      description,
-      quantity,
-      unit,
-      unitPrice,
-      totalPrice,
-      vatRate,
-    };
-  });
-
-  return {
-    invoiceNumber,
-    invoiceDate,
-    supplier: supplierName,
-    totalAmount,
-    lines,
-  };
-};
+import { parseInvoiceXml, deriveTradingItems, formatCurrency } from '@/lib/invoiceParser';
+import { useInvoiceUpload } from '@/hooks/useInvoiceUpload';
 
 export default function InvoiceImportPage() {
   const [parsedInvoice, setParsedInvoice] = useState<ParsedInvoice | null>(null);
@@ -103,13 +12,20 @@ export default function InvoiceImportPage() {
   const [fileName, setFileName] = useState('');
   const [error, setError] = useState('');
 
+  // 1. Using the hook for uploading invoice to backend
+  const { uploadToBackend, isUploading, uploadMessage } = useInvoiceUpload();
+
   useEffect(() => {
-    const storedState = loadInvoiceState();
-    if (storedState) {
-      setParsedInvoice(storedState.parsedInvoice);
-      setTradingItems(storedState.tradingItems);
-      setFileName(storedState.fileName);
-    }
+    const initData = async () => {
+      const storedState = loadInvoiceState();
+      if (storedState) {
+        setParsedInvoice(storedState.parsedInvoice);
+        setTradingItems(storedState.tradingItems);
+        setFileName(storedState.fileName);
+      }
+    };
+
+    initData();
   }, []);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -129,10 +45,13 @@ export default function InvoiceImportPage() {
       }
 
       try {
+        // 2. Using the imported parser functions
         const invoice = parseInvoiceXml(reader.result);
         const derivedItems = deriveTradingItems(invoice.lines, invoice.supplier);
+        
         setParsedInvoice(invoice);
         setTradingItems(derivedItems);
+        
         saveInvoiceState({
           parsedInvoice: invoice,
           tradingItems: derivedItems,
@@ -206,6 +125,26 @@ export default function InvoiceImportPage() {
                       <span className="font-semibold text-slate-900">{parsedInvoice.totalAmount}</span>
                     </div>
                   </div>
+
+                  {/* 3. Using the hook's states and function here */}
+                  <div className="mt-6 pt-6 border-t border-slate-100">
+                    <button
+                      onClick={() => uploadToBackend(parsedInvoice, fileName)}
+                      disabled={isUploading}
+                      className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-4 rounded-xl transition-colors disabled:bg-slate-300 disabled:cursor-not-allowed"
+                    >
+                      {isUploading ? 'Saving...' : 'Save Invoice to Database'}
+                    </button>
+
+                    {uploadMessage && (
+                      <div className={`mt-3 p-3 rounded-lg text-sm font-medium ${
+                        uploadMessage.type === 'success' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200'
+                      }`}>
+                        {uploadMessage.text}
+                      </div>
+                    )}
+                  </div>
+
                 </section>
 
                 <section className="bg-white shadow-sm rounded-2xl border border-slate-200 p-6">

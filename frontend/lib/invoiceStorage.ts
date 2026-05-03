@@ -36,6 +36,26 @@ export interface StoredInvoiceState {
   rawXml: string;
 }
 
+export interface InvoiceSummary {
+  id: string;
+  invoiceNumber: string;
+  supplier: string;
+  amount: number;
+  date: string;
+  fileName: string;
+}
+
+export interface InvoiceDetailLine {
+  id: string;
+  raw_description: string;
+  quantity: number;
+  unit: string;
+  unit_price: number;
+  calculated_unit_price: number;
+  standard_uom: string;
+  standard_ingredients: { name: string } | null;
+}
+
 const STORAGE_KEY = 'chefmes.invoiceImport';
 
 export function loadInvoiceState(): StoredInvoiceState | null {
