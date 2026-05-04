@@ -55,8 +55,13 @@ export const getSuppliers = async (req: any, res: Response) => {
 };
 
 export const getInvoicesBySupplier = async (req: any, res: Response) => {
-    const userId = req.user.id;
-    const supplierId = req.params.supplierId;
+    const userId = req.user?.id;
+    const supplierId = req.params.supplierId || req.params.id;;
+    
+    if (!supplierId || supplierId === 'undefined') {
+        console.error("Invalid Supplier ID received:", supplierId);
+        return res.status(400).json([]);
+    }
 
     try {
         const { data: invoices, error } = await supabase
