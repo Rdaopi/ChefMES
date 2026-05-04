@@ -99,6 +99,8 @@ const translations: Record<Locale, Record<string, string>> = {
     expandFullscreen: 'Expand Fullscreen',
     minimize: 'Minimize',
     fullscreen: 'Fullscreen',
+    noSuppliersFound: 'No suppliers found.',
+    lastOrder: 'Last Order',
   },
   it: {
     appName: 'ChefMES',
@@ -189,6 +191,8 @@ const translations: Record<Locale, Record<string, string>> = {
     expandFullscreen: 'Espandi a Schermo Intero',
     minimize: 'Minimizza',
     fullscreen: 'Schermo Intero',
+    noSuppliersFound: 'Nessun fornitore trovato.',
+    lastOrder: 'Ultimo Ordine',
   },
   fr: {
     appName: 'ChefMES',
@@ -279,6 +283,8 @@ const translations: Record<Locale, Record<string, string>> = {
     expandFullscreen: 'Plein Écran',
     minimize: 'Minimiser',
     fullscreen: 'Plein Écran',
+    noSuppliersFound: 'Aucun fournisseur trouvé.',
+    lastOrder: 'Dernière commande',
   },
   de: {
     appName: 'ChefMES',
@@ -369,6 +375,8 @@ const translations: Record<Locale, Record<string, string>> = {
     expandFullscreen: 'Vollbild erweitern',
     minimize: 'Minimieren',
     fullscreen: 'Vollbild',
+    noSuppliersFound: 'Keine Lieferanten gefunden.',
+    lastOrder: 'Letzte Bestellung',
   },
 };
 

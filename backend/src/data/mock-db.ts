@@ -11,11 +11,6 @@ export let terminalItems = [
     { id: 'term-2', ingredient: 'Farina Tipo 00 25kg', supplier: 'Molino Bianco', contractPrice: 18.50, livePrice: 16.20, trend: '-12.4%', trendDirection: 'down', status: 'Opportunity' }
 ];
 
-export const invoicesData = [
-    { id: 'INV-2026/04', supplier: 'Global Carni SPA', amount: 3450.00, aiVerification: 'Salami Slicing Detected (+€45.20)', verificationStatus: 'error', actionTaken: 'Payment Blocked', actionStatus: 'blocked' },
-    { id: 'INV-2026/05', supplier: 'Cantine Riunite', amount: 1200.00, aiVerification: 'Matches Contracts', verificationStatus: 'success', actionTaken: 'Cleared for Payment', actionStatus: 'cleared' }
-];
-
 export const menusList = [
     { id: 'm1', dishName: 'Truffle Risotto', category: 'Main Course', productionCost: 9.50, sellingPrice: 28.00, profitMargin: 18.50, status: 'Star', trend: 'stable' },
     { id: 'm2', dishName: 'Wagyu Burger', category: 'Main Course', productionCost: 11.20, sellingPrice: 24.00, profitMargin: 12.80, status: 'Dog', trend: 'down' },
@@ -34,8 +29,3 @@ export const ordersData = {
     pending: [{ id: 'ORD-992', title: 'Fresh Produce Weekly', amount: 450.00, supplier: 'Ortofrutta Trentina', status: 'scanning', date: 'Today' }],
     approved: [{ id: 'ORD-991', title: 'Dairy & Cheese', amount: 1200.00, supplier: 'Centrale del Latte', status: 'sent', date: 'Yesterday' }, { id: 'ORD-990', title: 'Meat & Poultry Supply', amount: 3450.00, supplier: 'Global Carni SPA', status: 'delivered', date: '2 days ago' }]
 };
-
-export const suppliersList = [
-    { id: 'sup-1', name: 'Bianchi Srl', category: 'Beverage & Spirits', score: 98, status: 'excellent', icon: 'fa-building', insightTitle: 'Highly Reliable', insightDescription: '0 invoice errors in the last 12 months.' },
-    { id: 'sup-2', name: 'Rossi Distribuzione', category: 'Oils & Condiments', score: 42, status: 'warning', icon: 'fa-industry', insightTitle: 'Warning', insightDescription: 'Frequent unannounced price hikes.' }
-];
