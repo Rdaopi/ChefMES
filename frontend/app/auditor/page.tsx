@@ -1,7 +1,8 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslations } from '@/components/LanguageProvider';
 import { useInvoiceAuditor } from '@/hooks/useInvoiceAuditor';
+import { useInvoiceDelete } from '@/hooks/useInvoiceDelete';
 import { InvoiceSummary, InvoiceDetailLine } from '@/lib/invoiceStorage';
 
 export default function InvoiceAuditorPage() {
@@ -54,10 +55,31 @@ function InvoiceTable({ invoices, isLoading, onSelectInvoice, t }: any) {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10; // Quante fatture mostrare per pagina
 
-  // Calcoli per la paginazione
-  const totalPages = Math.max(1, Math.ceil(invoices.length / itemsPerPage));
+  // --- NOVITÀ: Stato locale per gestire l'eliminazione senza refresh ---
+  const [localInvoices, setLocalInvoices] = useState<InvoiceSummary[]>([]);
+  const { deleteInvoice, isDeleting } = useInvoiceDelete();
+
+  // Sincronizza le fatture locali quando cambiano i dati dal DB
+  useEffect(() => {
+    setLocalInvoices(invoices || []);
+  }, [invoices]);
+
+  // Gestione click sul cestino
+  const handleDeleteClick = async (invoiceId: string) => {
+    if (window.confirm("Sei sicuro di voler eliminare questa fattura? Verranno eliminati anche tutti i dettagli associati. L'operazione è irreversibile.")) {
+      const success = await deleteInvoice(invoiceId);
+      
+      if (success) {
+        // Rimuove immediatamente la fattura dall'interfaccia!
+        setLocalInvoices(prev => prev.filter(inv => inv.id !== invoiceId));
+      }
+    }
+  };
+
+  // Calcoli per la paginazione (ORA USANO localInvoices invece di invoices)
+  const totalPages = Math.max(1, Math.ceil(localInvoices.length / itemsPerPage));
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedInvoices = invoices.slice(startIndex, startIndex + itemsPerPage);
+  const paginatedInvoices = localInvoices.slice(startIndex, startIndex + itemsPerPage);
 
   const handlePrevPage = () => setCurrentPage((p) => Math.max(1, p - 1));
   const handleNextPage = () => setCurrentPage((p) => Math.min(totalPages, p + 1));
@@ -102,12 +124,24 @@ function InvoiceTable({ invoices, isLoading, onSelectInvoice, t }: any) {
                     € {invoice.amount.toFixed(2)}
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <button 
-                      onClick={() => onSelectInvoice(invoice)}
-                      className="bg-indigo-50 text-indigo-600 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-indigo-600 hover:text-white transition-all shadow-sm"
-                    >
-                      <i className="fas fa-search mr-1"></i> {t('viewAiAudit') || 'Vedi Dettagli'}
-                    </button>
+                    <div className="flex justify-end gap-2">
+                      <button 
+                        onClick={() => onSelectInvoice(invoice)}
+                        className="bg-indigo-50 text-indigo-600 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-indigo-600 hover:text-white transition-all shadow-sm"
+                      >
+                        <i className="fas fa-search mr-1"></i> {t('viewAiAudit') || 'Vedi Dettagli'}
+                      </button>
+                      
+                      {/* NOVITÀ: Tasto Elimina */}
+                      <button 
+                        onClick={() => handleDeleteClick(invoice.id)}
+                        disabled={isDeleting}
+                        className="bg-white border border-slate-200 text-slate-400 hover:bg-red-50 hover:text-red-600 hover:border-red-200 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                        title="Elimina Fattura"
+                      >
+                        <i className="fas fa-trash"></i>
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))
@@ -117,10 +151,10 @@ function InvoiceTable({ invoices, isLoading, onSelectInvoice, t }: any) {
       </div>
 
       {/* FOOTER DI PAGINAZIONE */}
-      {!isLoading && invoices.length > itemsPerPage && (
+      {!isLoading && localInvoices.length > itemsPerPage && (
         <div className="bg-slate-50 border-t border-slate-200 px-6 py-3 flex items-center justify-between">
           <p className="text-xs font-medium text-slate-500">
-            {t('showing') || 'Mostrando'} <span className="font-bold">{startIndex + 1}</span> {t('to') || 'a'} <span className="font-bold">{Math.min(startIndex + itemsPerPage, invoices.length)}</span> {t('of') || 'di'} <span className="font-bold">{invoices.length}</span> {t('results') || 'risultati'}
+            {t('showing') || 'Mostrando'} <span className="font-bold">{startIndex + 1}</span> {t('to') || 'a'} <span className="font-bold">{Math.min(startIndex + itemsPerPage, localInvoices.length)}</span> {t('of') || 'di'} <span className="font-bold">{localInvoices.length}</span> {t('results') || 'risultati'}
           </p>
           <div className="flex gap-2">
             <button 
@@ -147,17 +181,16 @@ function InvoiceTable({ invoices, isLoading, onSelectInvoice, t }: any) {
   );
 }
 
-// --- COMPONENTE: MODAL DETTAGLI CON SCHERMO INTERO ---
+// --- COMPONENTE: MODAL DETTAGLI CON SCHERMO INTERO (Invariato) ---
 
 function InvoiceDetailModal({ invoice, lines, isLoading, onClose, t }: any) {
-  // Stato per gestire la larghezza del pannello (Sidebar vs Fullscreen)
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   return (
     <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm flex justify-end z-50">
       <div 
         className={`bg-white h-full flex flex-col shadow-2xl transition-all duration-300 ease-in-out ${
-          isFullscreen ? 'w-full' : 'w-full max-w-3xl' // <-- Magia dell'estensione
+          isFullscreen ? 'w-full' : 'w-full max-w-3xl'
         } animate-in slide-in-from-right`}
       >
         
@@ -173,7 +206,6 @@ function InvoiceDetailModal({ invoice, lines, isLoading, onClose, t }: any) {
           
           {/* Controlli Header */}
           <div className="flex items-center gap-3">
-            {/* Toggle Button Fullscreen */}
             <button 
               onClick={() => setIsFullscreen(!isFullscreen)}
               className="px-4 py-2 bg-white border border-slate-200 text-slate-500 font-bold text-xs rounded-xl hover:bg-slate-100 hover:text-indigo-600 transition-all flex items-center gap-2"
@@ -183,7 +215,6 @@ function InvoiceDetailModal({ invoice, lines, isLoading, onClose, t }: any) {
               <span className="hidden sm:inline">{isFullscreen ? t('minimize') : t('fullscreen')}</span>
             </button>
 
-            {/* Pulsante Chiudi */}
             <button 
               onClick={onClose} 
               className="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-red-500 bg-white shadow-sm border border-slate-200 rounded-full transition-all"

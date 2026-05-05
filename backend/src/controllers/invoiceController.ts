@@ -6,28 +6,44 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 export const uploadInvoice = async (req: any, res: Response) => {
-  const { 
-    invoiceNumber, 
-    supplier: rawSupplier, 
-    lines, 
-    fileName, 
-    totalAmount, 
-    invoiceDate 
-  } = req.body;
+  const { invoiceNumber, supplier: rawSupplier, lines, fileName, totalAmount, invoiceDate } = req.body;
   const userId = req.user.id;
 
+  if (!lines?.length) {
+    return res.status(400).json({ error: "Invoice has no lines" });
+  }
+
   try {
-    // 0. Pre-fetch of categories to minimize DB calls inside the loop
-    const { data: categoriesData } = await supabase.from('ingredient_categories').select('id, name');
-    
-    // 1. Calling Gemini BEFORE saving the invoice to get the clean supplier and mapped items with UOM and conversion factors
+    // 1. Duplicate file check
+    const { data: existingInvoice } = await supabase
+      .from('invoices_mvp')
+      .select('id')
+      .eq('file_name', fileName)
+      .eq('user_id', userId)
+      .single();
+
+    if (existingInvoice) {
+      return res.status(409).json({ error: "This invoice has already been imported." });
+    }
+
+    // 2. Pre-fetch categories
+    const { data: categoriesData } = await supabase
+      .from('ingredient_categories')
+      .select('id, name');
+
+    // 3. AI normalization — must happen before supplier resolution
     const aiResult = await normalizeInvoiceLinesWithAI(lines, rawSupplier);
     const cleanSupplier = aiResult.cleanSupplier;
     const mappedItems = aiResult.items;
 
-    // 2. handling supplier (Find or Create)
-    let supplierId;
-    let { data: existingSupplier } = await supabase
+    if (mappedItems.length !== lines.length) {
+      console.error(`AI length mismatch: ${lines.length} sent, ${mappedItems.length} received`);
+      return res.status(500).json({ error: "AI processing failed, please retry" });
+    }
+
+    // 4. Find or create supplier
+    let supplierId: string;
+    const { data: existingSupplier } = await supabase
       .from('suppliers')
       .select('id')
       .eq('name', cleanSupplier)
@@ -39,94 +55,231 @@ export const uploadInvoice = async (req: any, res: Response) => {
     } else {
       const { data: newSupplier, error: suppErr } = await supabase
         .from('suppliers')
-        .insert({ user_id: userId, name: cleanSupplier })
-        .select('id').single();
-      
+        .insert({ user_id: userId, name: cleanSupplier, raw_name: rawSupplier })
+        .select('id')
+        .single();
       if (suppErr) throw suppErr;
-      supplierId = newSupplier.id;
+      supplierId = newSupplier!.id;
     }
 
-    // 3. Saving the invoice with the clean supplier and other details (without lines for now)
+    // 5. Fetch existing mappings — filtered by supplier_id + user_id
+    const { data: existingMappings } = await supabase
+      .from('ingredient_mappings')
+      .select('raw_description, standard_id, standard_uom, conversion_factor')
+      .eq('user_id', userId)
+      .eq('supplier_id', supplierId)
+      .in('raw_description', lines.map((l: any) => l.description));
+
+    const mappingCache = new Map(
+      (existingMappings || []).map(m => [m.raw_description, m])
+    );
+
+    // 6. Save invoice header
     const { data: invoice, error: invErr } = await supabase
       .from('invoices_mvp')
-      .insert({ 
-        user_id: userId, 
-        invoice_number: invoiceNumber, 
+      .insert({
+        user_id: userId,
+        invoice_number: invoiceNumber,
         supplier_id: supplierId,
         total_amount: totalAmount,
-        file_name: fileName, 
-        invoice_date: invoiceDate 
+        file_name: fileName,
+        invoice_date: invoiceDate
       })
-      .select('id').single();
+      .select('id')
+      .single();
 
     if (invErr) throw invErr;
 
-    // 4. Saving lines and updating ingredient database
-    for (const line of lines) {
-      const match = mappedItems.find((r: any) => r.original_desc === line.description);
-      
-      const standardName = match ? match.standard_name : line.description;
-      const categoryName = match ? match.category : "Other";
-      const standardUOM = match ? match.standard_uom : (line.unit || "PZ");
-      const conversionFactor = match ? match.conversion_factor : 1;
+    // 7. Separate cached lines from new lines
+    const linesToCreate: any[] = [];
+    const resolvedLines: any[] = [];
 
-      // Find the category ID (fallback to "Other" if not found)
-      const categoryId = categoriesData?.find(c => c.name.toLowerCase() === categoryName.toLowerCase())?.id 
-        || categoriesData?.find(c => c.name.toLowerCase() === "Other")?.id;
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const match = mappedItems[i];
+      const cached = mappingCache.get(line.description);
 
-      // Calclate the real cost per unit (e.g., cost per KG)
-      const usableUnitPrice = (line.unitPrice && conversionFactor > 0) 
-        ? parseFloat((line.unitPrice / conversionFactor).toFixed(4)) 
-        : line.unitPrice;
-
-      // A. Upsert Standard Ingredient
-      let { data: standardIng, error: ingErr } = await supabase.from('standard_ingredients')
-        .upsert(
-          { 
-            user_id: userId, 
-            name: standardName, 
-            category_id: categoryId, 
-            unit_of_measure: standardUOM,
-            current_price: usableUnitPrice 
-          },
-          { onConflict: 'name, user_id' }
-        ).select('id').single();
-
-      if (ingErr || !standardIng) {
-        console.error("Ingredient Insert Error:", ingErr);
-        continue;
+      if (cached) {
+        resolvedLines.push({
+          line,
+          standardId: cached.standard_id,
+          standardUOM: cached.standard_uom,
+          conversionFactor: Number(cached.conversion_factor)
+        });
+      } else {
+        linesToCreate.push({ line, match });
       }
-
-      // B. Upsert Mapping
-      await supabase.from('ingredient_mappings')
-        .upsert(
-          { 
-            user_id: userId, 
-            supplier_id: supplierId, 
-            raw_description: line.description, 
-            standard_id: standardIng.id,
-            standard_uom: standardUOM,
-            conversion_factor: conversionFactor
-          },
-          { onConflict: 'supplier_id, raw_description, user_id' }
-        );
-
-      // C. Inserting Invoice Line
-      await supabase.from('invoice_lines').insert({
-        user_id: userId,
-        invoice_id: invoice.id,
-        standard_id: standardIng.id,
-        raw_description: line.description,
-        quantity: line.quantity,
-        unit: line.unit,
-        unit_price: line.unitPrice,
-        standard_uom: standardUOM,
-        conversion_factor: conversionFactor,
-        calculated_unit_price: usableUnitPrice
-      });
     }
 
-    res.json({ success: true, message: 'Invoice processed with success!' });
+    // 8. Process new lines
+    if (linesToCreate.length > 0) {
+
+      // Split real ingredients from admin/fee lines
+      const ingredientLines = linesToCreate.filter(
+        ({ match }) => match.category !== 'Other' && match.standard_name?.trim()
+      );
+      const adminLines = linesToCreate.filter(
+        ({ match }) => match.category === 'Other' || !match.standard_name?.trim()
+      );
+
+      // Admin lines pass through with no standard_id
+      adminLines.forEach(({ line, match }) => {
+        resolvedLines.push({
+          line,
+          standardId: null,
+          standardUOM: match.standard_uom || 'PZ',
+          conversionFactor: match.conversion_factor || 1
+        });
+      });
+
+      if (ingredientLines.length > 0) {
+        const ingredientsToUpsert = ingredientLines.map(({ match }) => ({
+          user_id: userId,
+          name: match.standard_name,
+          category_id:
+            categoriesData?.find(c => c.name.toLowerCase() === match.category.toLowerCase())?.id ??
+            categoriesData?.find(c => c.name.toLowerCase() === 'other')?.id,
+          unit_of_measure: match.standard_uom
+        }));
+
+        // Deduplicate by name+uom before sending to DB
+        const seen = new Set<string>();
+        const deduplicatedIngredients = ingredientsToUpsert.filter(({ name, unit_of_measure }) => {
+          const key = `${name.toLowerCase().trim()}|${unit_of_measure}`;
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        });
+
+        const { data: upsertedIngredients, error: ingErr } = await supabase
+          .from('standard_ingredients')
+          .upsert(deduplicatedIngredients, { onConflict: 'name, user_id' })
+          .select('id, name');
+
+        if (ingErr) throw ingErr;
+
+        const ingMap = new Map((upsertedIngredients || []).map(i => [i.name, i.id]));
+
+        // Upsert mappings for future cache hits
+        const mappingsToUpsert = ingredientLines.map(({ line, match }) => ({
+          user_id: userId,
+          supplier_id: supplierId,
+          raw_description: line.description,
+          standard_id: ingMap.get(match.standard_name),
+          standard_uom: match.standard_uom,
+          conversion_factor: match.conversion_factor,
+          suggested_name: match.standard_name,
+          suggested_category: match.category,
+          pieces_per_invoice_unit: match.pieces_per_invoice_unit,
+          capacity_per_piece: match.capacity_per_piece,
+          ai_confidence: 'high'
+        }));
+
+        await supabase
+          .from('ingredient_mappings')
+          .upsert(mappingsToUpsert, { onConflict: 'supplier_id, raw_description, user_id' });
+
+        ingredientLines.forEach(({ line, match }) => {
+          resolvedLines.push({
+            line,
+            standardId: ingMap.get(match.standard_name),
+            standardUOM: match.standard_uom,
+            conversionFactor: match.conversion_factor
+          });
+        });
+      }
+    }
+
+    // 9. Update prices — only if this invoice is the most recent
+    const priceUpdates = resolvedLines
+      .filter(r => r.standardId != null && r.line.unitPrice && r.conversionFactor > 0)
+      .map(r => ({
+        id: r.standardId,
+        current_price: parseFloat((r.line.unitPrice / r.conversionFactor).toFixed(4)),
+        last_updated: invoiceDate
+      }));
+
+    for (const update of priceUpdates) {
+      await supabase
+        .from('standard_ingredients')
+        .update({ current_price: update.current_price, last_updated: update.last_updated })
+        .eq('id', update.id)
+        .eq('user_id', userId)
+        .lte('last_updated', update.last_updated);
+    }
+
+    // 10. Insert invoice lines
+    const invoiceLinesToInsert = resolvedLines.map(r => ({
+      user_id: userId,
+      invoice_id: invoice!.id,
+      standard_id: r.standardId,
+      raw_description: r.line.description,
+      quantity: r.line.quantity,
+      unit: r.line.unit,
+      unit_price: r.line.unitPrice,
+      standard_uom: r.standardUOM,
+      conversion_factor: r.conversionFactor
+    }));
+
+    const { error: linesErr } = await supabase
+      .from('invoice_lines')
+      .insert(invoiceLinesToInsert);
+
+    if (linesErr) throw linesErr;
+
+    // 11. Log dish history for any dish affected by updated prices
+    const updatedIngredientIds = priceUpdates.map(u => u.id);
+
+    if (updatedIngredientIds.length > 0) {
+      const { data: affectedRecipes } = await supabase
+        .from('recipes')
+        .select('dish_id')
+        .eq('user_id', userId)
+        .in('standard_id', updatedIngredientIds);
+
+      const affectedDishIds = [...new Set((affectedRecipes || []).map((r: any) => r.dish_id))];
+
+      if (affectedDishIds.length > 0) {
+        const [{ data: affectedDishes }, { data: allDishRecipes }] = await Promise.all([
+          supabase
+            .from('menu_dishes')
+            .select('id, selling_price')
+            .eq('user_id', userId)
+            .in('id', affectedDishIds),
+          supabase
+            .from('recipes')
+            .select('dish_id, quantity_needed, standard_ingredients(current_price)')
+            .eq('user_id', userId)
+            .in('dish_id', affectedDishIds)
+        ]);
+
+        const historyLogs = (affectedDishes || []).map((dish: any) => {
+          const dishLines = (allDishRecipes || []).filter((r: any) => r.dish_id === dish.id);
+          const productionCost = dishLines.reduce(
+            (sum: number, r: any) =>
+              sum + Number(r.quantity_needed) * Number(r.standard_ingredients?.current_price || 0),
+            0
+          );
+          const sellingPrice = Number(dish.selling_price);
+          const profitMargin = sellingPrice > 0
+            ? ((sellingPrice - productionCost) / sellingPrice) * 100
+            : 0;
+
+          return {
+            dish_id: dish.id,
+            production_cost: parseFloat(productionCost.toFixed(4)),
+            selling_price: sellingPrice,
+            profit_margin: parseFloat(profitMargin.toFixed(2))
+          };
+        });
+
+        if (historyLogs.length > 0) {
+          await supabase.from('dish_history_logs').insert(historyLogs);
+        }
+      }
+    }
+
+    res.json({ success: true, message: 'Invoice processed successfully!' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Error processing the invoice" });
@@ -140,31 +293,28 @@ export const getInvoices = async (req: any, res: Response) => {
     const { data, error } = await supabase
       .from('invoices_mvp')
       .select(`
-        id, 
-        invoice_number, 
-        total_amount, 
-        file_name, 
+        id,
+        invoice_number,
+        total_amount,
+        file_name,
         invoice_date,
         suppliers ( name )
       `)
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
 
-      if (error) throw error;
+    if (error) throw error;
 
-      // CORREZIONE QUI SOTTO: (inv: any) racchiuso tra parentesi
-      const formattedInvoices = data?.map((inv: any) => ({
-        id: inv.id,
-        invoiceNumber: inv.invoice_number,
-        supplier: inv.suppliers?.name || "Unknown",
-        amount: inv.total_amount,
-        date: inv.invoice_date,
-        fileName: inv.file_name
-       })) || [];
-      
-       // NOTA IMPORTANTE: Il backend ora invia { invoices: [...] } invece di un array diretto.
-       // Se il tuo frontend si aspetta un array diretto, usa `res.json(formattedInvoices);`
-       res.json(formattedInvoices); 
+    const formattedInvoices = data?.map((inv: any) => ({
+      id: inv.id,
+      invoiceNumber: inv.invoice_number,
+      supplier: inv.suppliers?.name || "Unknown",
+      amount: inv.total_amount,
+      date: inv.invoice_date,
+      fileName: inv.file_name
+    })) || [];
+
+    res.json(formattedInvoices);
   } catch (error) {
     console.error("Error fetching invoices:", error);
     res.status(500).json({ error: "Error fetching invoices" });
@@ -192,11 +342,41 @@ export const getInvoiceDetails = async (req: any, res: Response) => {
       .eq('invoice_id', id)
       .eq('user_id', userId);
 
-      if (error) throw error;
+    if (error) throw error;
 
-      res.json(data);
+    res.json(data);
   } catch (error) {
     console.error("Error fetching invoice details:", error);
     res.status(500).json({ error: "Error fetching invoice details" });
+  }
+};
+
+export const deleteInvoice = async (req: any, res: Response) => {
+  const userId = req.user.id;
+  const { id } = req.params;
+
+  try {
+    const { error: lineErr } = await supabase
+      .from('invoice_lines')
+      .delete()
+      .eq('invoice_id', id)
+      .eq('user_id', userId);
+
+    if (lineErr) throw lineErr;
+
+    const { error: invoiceErr } = await supabase
+      .from('invoices_mvp')
+      .delete()
+      .eq('id', id)
+      .eq('user_id', userId);
+
+    if (invoiceErr) throw invoiceErr;
+
+    console.warn(`Invoice ${id} deleted. Prices may be stale for affected ingredients.`);
+
+    res.json({ success: true, message: 'Invoice deleted successfully!' });
+  } catch (error) {
+    console.error("Error deleting invoice:", error);
+    res.status(500).json({ error: "Error deleting invoice" });
   }
 };
