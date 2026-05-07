@@ -132,6 +132,7 @@ export const uploadInvoice = async (req: any, res: Response) => {
         });
       });
 
+      // 8. For ingredient lines, upsert any new ingredients and then create mappings
       if (ingredientLines.length > 0) {
         const ingredientsToUpsert = ingredientLines.map(({ match }) => ({
           user_id: userId,
@@ -142,7 +143,7 @@ export const uploadInvoice = async (req: any, res: Response) => {
           unit_of_measure: match.standard_uom
         }));
 
-        // Deduplicate by name+uom before sending to DB
+        // Deduplicate by name before sending to DB
         const seen = new Set<string>();
         const deduplicatedIngredients = ingredientsToUpsert.filter(({ name, unit_of_measure }) => {
           const key = `${name.toLowerCase().trim()}|${unit_of_measure}`;
@@ -151,21 +152,34 @@ export const uploadInvoice = async (req: any, res: Response) => {
           return true;
         });
 
-        const { data: upsertedIngredients, error: ingErr } = await supabase
+        const sentNames = deduplicatedIngredients.map(i => i.name);
+
+        // Upsert ingredients
+        const { error: ingErr } = await supabase
           .from('standard_ingredients')
-          .upsert(deduplicatedIngredients, { onConflict: 'name, user_id' })
-          .select('id, name');
+          .upsert(deduplicatedIngredients, { onConflict: 'name, user_id' });
 
         if (ingErr) throw ingErr;
 
-        const ingMap = new Map((upsertedIngredients || []).map(i => [i.name, i.id]));
+        // ALWAYS fetch after upsert — Supabase may return empty on conflict
+        const { data: resolvedIngredients, error: fetchErr } = await supabase
+          .from('standard_ingredients')
+          .select('id, name')
+          .eq('user_id', userId)
+          .in('name', sentNames);
 
-        // Upsert mappings for future cache hits
+        if (fetchErr) throw fetchErr;
+
+        const ingMap = new Map(
+          (resolvedIngredients || []).map(i => [i.name.toLowerCase().trim(), i.id])
+        );
+
+        // Build mappings
         const mappingsToUpsert = ingredientLines.map(({ line, match }) => ({
           user_id: userId,
           supplier_id: supplierId,
           raw_description: line.description,
-          standard_id: ingMap.get(match.standard_name),
+          standard_id: ingMap.get(match.standard_name.toLowerCase().trim()),
           standard_uom: match.standard_uom,
           conversion_factor: match.conversion_factor,
           suggested_name: match.standard_name,
@@ -175,14 +189,36 @@ export const uploadInvoice = async (req: any, res: Response) => {
           ai_confidence: 'high'
         }));
 
-        await supabase
+        // Log any unmapped to catch issues
+        const unmapped = mappingsToUpsert.filter(m => !m.standard_id);
+        if (unmapped.length > 0) {
+          console.warn('Warning: these lines have no standard_id:', unmapped.map(m => m.raw_description));
+        }
+
+        const seenDescriptions = new Set<string>();
+        const deduplicatedMappings = mappingsToUpsert
+          .filter(m => m.standard_id != null)
+          .filter(m => {
+            const key = m.raw_description.toLowerCase().trim();
+            if (seenDescriptions.has(key)) return false;
+            seenDescriptions.add(key);
+            return true;
+          });
+
+        const { error: mappingErr } = await supabase
           .from('ingredient_mappings')
-          .upsert(mappingsToUpsert, { onConflict: 'supplier_id, raw_description, user_id' });
+          .upsert(deduplicatedMappings, 
+            { onConflict: 'supplier_id, raw_description, user_id' });
+
+        if (mappingErr) {
+          console.error('Mapping upsert error:', mappingErr);
+          throw mappingErr;
+        }
 
         ingredientLines.forEach(({ line, match }) => {
           resolvedLines.push({
             line,
-            standardId: ingMap.get(match.standard_name),
+            standardId: ingMap.get(match.standard_name.toLowerCase().trim()),
             standardUOM: match.standard_uom,
             conversionFactor: match.conversion_factor
           });
