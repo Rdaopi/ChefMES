@@ -67,3 +67,5 @@ pids
 # OS files
 Thumbs.db
 desktop.ini
+
+.sql

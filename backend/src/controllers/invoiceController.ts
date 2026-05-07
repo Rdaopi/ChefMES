@@ -235,14 +235,6 @@ export const uploadInvoice = async (req: any, res: Response) => {
         last_updated: invoiceDate
       }));
 
-    for (const update of priceUpdates) {
-      await supabase
-        .from('standard_ingredients')
-        .update({ current_price: update.current_price, last_updated: update.last_updated })
-        .eq('id', update.id)
-        .eq('user_id', userId)
-        .lte('last_updated', update.last_updated);
-    }
 
     // 10. Insert invoice lines
     const invoiceLinesToInsert = resolvedLines.map(r => ({
