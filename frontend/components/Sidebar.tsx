@@ -25,13 +25,17 @@ export default function Sidebar() {
                 <i className="fas fa-utensils w-6"></i>
                 <span className="font-medium">{t('menuEngineering')}</span>
             </Link>
+            <Link href="/preparations" className="flex items-center px-4 py-3 hover:bg-slate-800 hover:text-white rounded-xl transition-colors">
+                <i className="fas fa-flask w-6"></i>
+                <span className="font-medium">{t('preparations')}</span>
+            </Link>
             <Link href="/auditor" className="flex items-center px-4 py-3 hover:bg-slate-800 hover:text-white rounded-xl transition-colors">
                 <i className="fas fa-file-invoice-dollar w-6"></i>
                 <span className="font-medium">{t('invoiceAuditor')}</span>
             </Link>
             <Link href="/invoice-import" className="flex items-center px-4 py-3 hover:bg-slate-800 hover:text-white rounded-xl transition-colors">
                 <i className="fas fa-file-import w-6"></i>
-                <span className="font-medium">Invoice Import</span>
+                <span className="font-medium">{t('invoiceImport')}</span>
             </Link>
             <Link href="/suppliers" className="flex items-center px-4 py-3 hover:bg-slate-800 hover:text-white rounded-xl transition-colors">
                 <i className="fas fa-users w-6"></i>

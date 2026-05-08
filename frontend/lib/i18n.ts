@@ -101,6 +101,75 @@ const translations: Record<Locale, Record<string, string>> = {
     fullscreen: 'Fullscreen',
     noSuppliersFound: 'No suppliers found.',
     lastOrder: 'Last Order',
+    loading: 'Loading...',
+    saveFailed: 'Error during save',
+    
+    // Login & Authentication
+    welcomeBack: 'Welcome back',
+    createAccount: 'Create an account',
+    enterCredentials: 'Enter your credentials to access ChefMES',
+    startManaging: 'Start managing your restaurant smartly with ChefMES',
+    email: 'Email',
+    password: 'Password',
+    logIn: 'Log in',
+    signUp: 'Sign up',
+    dontHaveAccount: 'Don\'t have an account? Sign up',
+    haveAccount: 'Already have an account? Log in',
+    registrationCompleted: 'Registration completed! You can now log in.',
+    errorOccurred: 'An error occurred.',
+    
+    // Invoice Import
+    invoiceImport: 'Invoice Import',
+    uploadXmlInvoice: 'Upload an XML restaurant invoice and preview parsed line items with simple trading signals.',
+    selectXmlFile: 'Select an XML invoice file from your computer',
+    noInvoiceLoaded: 'No invoice loaded yet. Choose an XML invoice file to display invoice details and trading signals.',
+    invoiceSummary: 'Invoice Summary',
+    invoiceNumber: 'Invoice number',
+    totalAmount: 'Total amount',
+    saving: 'Saving...',
+    saveInvoiceDb: 'Save Invoice to Database',
+    loadedFile: 'Loaded file:',
+    invoiceSavedSuccess: 'Invoice saved to database successfully!',
+    unableToSave: 'Unable to save the invoice. Please try again.',
+    notAuthenticated: 'User is not authenticated. Please log in again.',
+    communicationError: 'Communication error with server',
+    
+    // Menus
+    realTimeDishProfitability: 'Real-time dish profitability',
+    addNewDish: 'New Dish',
+    avgFoodCost: 'Average Food Cost',
+    itemsAtRisk: 'At-risk Dishes',
+    dishName: 'Dish Name',
+    noDishesDefined: 'No dishes in menu. Click "New Dish" to get started.',
+    confirmDeleteDish: 'Are you sure you want to delete this dish? You will also lose the cost history.',
+    deleteError: 'Error during deletion.',
+    
+    // Suppliers
+    loadingSuppliers: 'Loading suppliers...',
+    totalSpent: 'Total Spent',
+    loadingInvoices: 'Loading invoices...',
+    detail: 'Detail',
+    invoice: 'Invoice',
+    noInvoiceDetails: 'No line details found for this invoice.',
+    invoices: 'Invoices',
+    confirmDeleteInvoice: 'Are you sure you want to delete this invoice? All associated details will be deleted. This operation cannot be undone.',
+    
+    // Terminal
+    importedFrom: 'Imported from',
+    
+    // Preparations
+    preparations: 'Preparations',
+    preparationDescription: 'Semi-finished products and reusable bases in recipes',
+    newPreparation: 'New Preparation',
+    name: 'Name',
+    yield: 'Yield',
+    ingredientCount: 'Number of Ingredients',
+    noPreparationsInfo: 'No preparations. Click "New Preparation" to get started.',
+    confirmDeletePreparation: 'Are you sure you want to delete this preparation?',
+    
+    // Delete Operations
+    invoiceDeletedSuccess: 'Invoice deleted successfully!',
+    unableToDelete: 'Unable to delete. Please try again.',
   },
   it: {
     appName: 'ChefMES',
@@ -193,6 +262,75 @@ const translations: Record<Locale, Record<string, string>> = {
     fullscreen: 'Schermo Intero',
     noSuppliersFound: 'Nessun fornitore trovato.',
     lastOrder: 'Ultimo Ordine',
+    loading: 'Caricamento...',
+    saveFailed: 'Errore durante il salvataggio',
+    
+    // Login & Authentication
+    welcomeBack: 'Bentornato',
+    createAccount: 'Crea un account',
+    enterCredentials: 'Inserisci le tue credenziali per accedere a ChefMES',
+    startManaging: 'Inizia a gestire il tuo ristorante in modo intelligente con ChefMES',
+    email: 'Email',
+    password: 'Password',
+    logIn: 'Accedi',
+    signUp: 'Registrati',
+    dontHaveAccount: 'Non hai un account? Registrati',
+    haveAccount: 'Hai già un account? Accedi',
+    registrationCompleted: 'Registrazione completata! Puoi ora accedere.',
+    errorOccurred: 'Si è verificato un errore.',
+    
+    // Invoice Import
+    invoiceImport: 'Importa Fattura',
+    uploadXmlInvoice: 'Carica una fattura di ristorante in formato XML e visualizza gli articoli analizzati con semplici segnali di trading.',
+    selectXmlFile: 'Seleziona un file XML dalla fattura dal tuo computer',
+    noInvoiceLoaded: 'Nessuna fattura caricata. Scegli un file fattura XML per visualizzare i dettagli della fattura e i segnali di trading.',
+    invoiceSummary: 'Riepilogo Fattura',
+    invoiceNumber: 'Numero fattura',
+    totalAmount: 'Importo totale',
+    saving: 'Salvataggio in corso...',
+    saveInvoiceDb: 'Salva Fattura nel Database',
+    loadedFile: 'File caricato:',
+    invoiceSavedSuccess: 'Fattura salvata nel database con successo!',
+    unableToSave: 'Impossibile salvare la fattura. Riprova.',
+    notAuthenticated: 'Utente non autenticato. Accedi di nuovo.',
+    communicationError: 'Errore di comunicazione con il server',
+    
+    // Menus
+    realTimeDishProfitability: 'Profittabilità dei piatti in tempo reale',
+    addNewDish: 'Nuovo Piatto',
+    avgFoodCost: 'Food Cost Medio',
+    itemsAtRisk: 'Piatti a Rischio',
+    dishName: 'Nome Piatto',
+    noDishesDefined: 'Nessun piatto nel menu. Clicca su "Nuovo Piatto" per iniziare.',
+    confirmDeleteDish: 'Sei sicuro di voler eliminare questo piatto? Perderai anche lo storico dei costi.',
+    deleteError: 'Errore durante l\'eliminazione.',
+    
+    // Suppliers
+    loadingSuppliers: 'Caricamento fornitori...',
+    totalSpent: 'Spesa Totale',
+    loadingInvoices: 'Caricamento fatture...',
+    detail: 'Dettaglio',
+    invoice: 'Fattura',
+    noInvoiceDetails: 'Nessun dettaglio riga trovato per questa fattura.',
+    invoices: 'Fatture',
+    confirmDeleteInvoice: 'Sei sicuro di voler eliminare questa fattura? Verranno eliminati anche tutti i dettagli associati. L\'operazione è irreversibile.',
+    
+    // Terminal
+    importedFrom: 'Importato da',
+    
+    // Preparations
+    preparations: 'Preparazioni',
+    preparationDescription: 'Semilavorati e basi riutilizzabili nelle ricette',
+    newPreparation: 'Nuova Preparazione',
+    name: 'Nome',
+    yield: 'Resa',
+    ingredientCount: 'N. Ingredienti',
+    noPreparationsInfo: 'Nessuna preparazione. Clicca su "Nuova Preparazione" per iniziare.',
+    confirmDeletePreparation: 'Sei sicuro di voler eliminare questa preparazione?',
+    
+    // Delete Operations
+    invoiceDeletedSuccess: 'Fattura eliminata con successo!',
+    unableToDelete: 'Impossibile eliminare. Riprova.',
   },
   fr: {
     appName: 'ChefMES',
@@ -285,6 +423,75 @@ const translations: Record<Locale, Record<string, string>> = {
     fullscreen: 'Plein Écran',
     noSuppliersFound: 'Aucun fournisseur trouvé.',
     lastOrder: 'Dernière commande',
+    loading: 'Chargement...',
+    saveFailed: 'Erreur lors de l\'enregistrement',
+    
+    // Login & Authentication
+    welcomeBack: 'Bienvenue',
+    createAccount: 'Créer un compte',
+    enterCredentials: 'Entrez vos identifiants pour accéder à ChefMES',
+    startManaging: 'Commencez à gérer votre restaurant intelligemment avec ChefMES',
+    email: 'Email',
+    password: 'Mot de passe',
+    logIn: 'Se connecter',
+    signUp: 'S\'inscrire',
+    dontHaveAccount: 'Pas de compte ? S\'inscrire',
+    haveAccount: 'Déjà un compte ? Se connecter',
+    registrationCompleted: 'Enregistrement terminé ! Vous pouvez maintenant vous connecter.',
+    errorOccurred: 'Une erreur s\'est produite.',
+    
+    // Invoice Import
+    invoiceImport: 'Importer Facture',
+    uploadXmlInvoice: 'Téléchargez une facture de restaurant au format XML et prévisualisez les articles analysés avec des signaux commerciaux simples.',
+    selectXmlFile: 'Sélectionnez un fichier XML de facture depuis votre ordinateur',
+    noInvoiceLoaded: 'Aucune facture chargée. Choisissez un fichier de facture XML pour afficher les détails et les signaux commerciaux.',
+    invoiceSummary: 'Résumé de la Facture',
+    invoiceNumber: 'Numéro de facture',
+    totalAmount: 'Montant total',
+    saving: 'Enregistrement en cours...',
+    saveInvoiceDb: 'Enregistrer la Facture dans la Base de Données',
+    loadedFile: 'Fichier chargé :',
+    invoiceSavedSuccess: 'Facture enregistrée dans la base de données avec succès !',
+    unableToSave: 'Impossible d\'enregistrer la facture. Veuillez réessayer.',
+    notAuthenticated: 'Utilisateur non authentifié. Veuillez vous reconnecter.',
+    communicationError: 'Erreur de communication avec le serveur',
+    
+    // Menus
+    realTimeDishProfitability: 'Rentabilité des plats en temps réel',
+    addNewDish: 'Nouveau Plat',
+    avgFoodCost: 'Coût Alimentaire Moyen',
+    itemsAtRisk: 'Plats à Risque',
+    dishName: 'Nom du Plat',
+    noDishesDefined: 'Aucun plat dans le menu. Cliquez sur « Nouveau Plat » pour commencer.',
+    confirmDeleteDish: 'Êtes-vous sûr de vouloir supprimer ce plat ? Vous perdrez également l\'historique des coûts.',
+    deleteError: 'Erreur lors de la suppression.',
+    
+    // Suppliers
+    loadingSuppliers: 'Chargement des fournisseurs...',
+    totalSpent: 'Total Dépensé',
+    loadingInvoices: 'Chargement des factures...',
+    detail: 'Détail',
+    invoice: 'Facture',
+    noInvoiceDetails: 'Aucun détail de ligne trouvé pour cette facture.',
+    invoices: 'Factures',
+    confirmDeleteInvoice: 'Êtes-vous sûr de vouloir supprimer cette facture ? Tous les détails associés seront supprimés. Cette opération est irréversible.',
+    
+    // Terminal
+    importedFrom: 'Importé de',
+    
+    // Preparations
+    preparations: 'Préparations',
+    preparationDescription: 'Produits semi-finis et bases réutilisables dans les recettes',
+    newPreparation: 'Nouvelle Préparation',
+    name: 'Nom',
+    yield: 'Rendement',
+    ingredientCount: 'Nombre d\'Ingrédients',
+    noPreparationsInfo: 'Aucune préparation. Cliquez sur « Nouvelle Préparation » pour commencer.',
+    confirmDeletePreparation: 'Êtes-vous sûr de vouloir supprimer cette préparation ?',
+    
+    // Delete Operations
+    invoiceDeletedSuccess: 'Facture supprimée avec succès !',
+    unableToDelete: 'Impossible de supprimer. Veuillez réessayer.',
   },
   de: {
     appName: 'ChefMES',
@@ -377,6 +584,75 @@ const translations: Record<Locale, Record<string, string>> = {
     fullscreen: 'Vollbild',
     noSuppliersFound: 'Keine Lieferanten gefunden.',
     lastOrder: 'Letzte Bestellung',
+    loading: 'Lädt...',
+    saveFailed: 'Fehler beim Speichern',
+    
+    // Login & Authentication
+    welcomeBack: 'Willkommen zurück',
+    createAccount: 'Konto erstellen',
+    enterCredentials: 'Geben Sie Ihre Anmeldedaten ein, um auf ChefMES zuzugreifen',
+    startManaging: 'Verwalten Sie Ihr Restaurant intelligent mit ChefMES',
+    email: 'E-Mail',
+    password: 'Passwort',
+    logIn: 'Anmelden',
+    signUp: 'Registrieren',
+    dontHaveAccount: 'Haben Sie noch kein Konto? Registrieren',
+    haveAccount: 'Haben Sie bereits ein Konto? Anmelden',
+    registrationCompleted: 'Registrierung abgeschlossen! Sie können sich jetzt anmelden.',
+    errorOccurred: 'Ein Fehler ist aufgetreten.',
+    
+    // Invoice Import
+    invoiceImport: 'Rechnung Importieren',
+    uploadXmlInvoice: 'Laden Sie eine Restaurantrechnung im XML-Format hoch und zeigen Sie analysierte Positionen mit einfachen Handelssignalen an.',
+    selectXmlFile: 'Wählen Sie eine XML-Rechnungsdatei von Ihrem Computer',
+    noInvoiceLoaded: 'Keine Rechnung geladen. Wählen Sie eine XML-Rechnungsdatei, um Rechnungsdetails und Handelssignale anzuzeigen.',
+    invoiceSummary: 'Rechnungszusammenfassung',
+    invoiceNumber: 'Rechnungsnummer',
+    totalAmount: 'Gesamtbetrag',
+    saving: 'Wird gespeichert...',
+    saveInvoiceDb: 'Rechnung in Datenbank speichern',
+    loadedFile: 'Geladene Datei:',
+    invoiceSavedSuccess: 'Rechnung erfolgreich in Datenbank gespeichert!',
+    unableToSave: 'Rechnung konnte nicht gespeichert werden. Versuchen Sie es erneut.',
+    notAuthenticated: 'Benutzer nicht authentifiziert. Melden Sie sich erneut an.',
+    communicationError: 'Kommunikationsfehler mit dem Server',
+    
+    // Menus
+    realTimeDishProfitability: 'Echtzeitrentabilität von Gerichten',
+    addNewDish: 'Neues Gericht',
+    avgFoodCost: 'Durchschnittliche Lebensmittelkosten',
+    itemsAtRisk: 'Gefährdete Gerichte',
+    dishName: 'Gerichtname',
+    noDishesDefined: 'Keine Gerichte im Menü. Klicken Sie auf „Neues Gericht", um zu beginnen.',
+    confirmDeleteDish: 'Sind Sie sicher, dass Sie dieses Gericht löschen möchten? Sie verlieren auch die Kostenverlauf.',
+    deleteError: 'Fehler beim Löschen.',
+    
+    // Suppliers
+    loadingSuppliers: 'Lieferanten werden geladen...',
+    totalSpent: 'Gesamtausgegeben',
+    loadingInvoices: 'Rechnungen werden geladen...',
+    detail: 'Detail',
+    invoice: 'Rechnung',
+    noInvoiceDetails: 'Keine Zeilendetails für diese Rechnung gefunden.',
+    invoices: 'Rechnungen',
+    confirmDeleteInvoice: 'Sind Sie sicher, dass Sie diese Rechnung löschen möchten? Alle zugehörigen Details werden gelöscht. Dieser Vorgang kann nicht rückgängig gemacht werden.',
+    
+    // Terminal
+    importedFrom: 'Importiert von',
+    
+    // Preparations
+    preparations: 'Zubereitungen',
+    preparationDescription: 'Halbfertige Produkte und wiederverwendbare Basen in Rezepten',
+    newPreparation: 'Neue Zubereitung',
+    name: 'Name',
+    yield: 'Ausbeute',
+    ingredientCount: 'Anzahl der Zutaten',
+    noPreparationsInfo: 'Keine Zubereitungen. Klicken Sie auf „Neue Zubereitung", um zu beginnen.',
+    confirmDeletePreparation: 'Sind Sie sicher, dass Sie diese Zubereitung löschen möchten?',
+    
+    // Delete Operations
+    invoiceDeletedSuccess: 'Rechnung erfolgreich gelöscht!',
+    unableToDelete: 'Kann nicht gelöscht werden. Bitte versuchen Sie es erneut.',
   },
 };
 
