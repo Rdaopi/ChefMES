@@ -27,6 +27,7 @@ router.get('/menus', authenticate, getMenus);
 router.get('/menus/:id', authenticate, getMenuById);
 router.get('/builder/ingredients', authenticate, getAvailableIngredients);
 router.post('/menus', authenticate, saveDishRecipe);
+router.put('/menus/:id', authenticate, saveDishRecipe);
 router.delete('/menus/:id', authenticate, deleteDish); 
 
 router.get('/preparations', authenticate, getPreparations);

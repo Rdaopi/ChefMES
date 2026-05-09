@@ -61,7 +61,7 @@ export const getMenus = async (req: any, res: Response) => {
           standard_ingredients ( current_price ),
           preparations (
             yield_quantity,
-            preparation_ingredients (
+            preparation_ingredients!prep_ingredients_prep_fkey (
               quantity_needed,
               standard_ingredients ( current_price )
             )
@@ -177,6 +177,8 @@ export const getMenuById = async (req: any, res: Response) => {
     let totalCost = 0;
 
     const ingredientsList = (recipes || []).map((ing: any) => {
+
+      // Case 1: preparation
       if (ing.preparations) {
         const prepCost = (ing.preparations.preparation_ingredients || [])
           .reduce((sum: number, pi: any) =>
@@ -188,6 +190,8 @@ export const getMenuById = async (req: any, res: Response) => {
         const total = Number(ing.quantity_needed) * costPerUnit;
         totalCost += total;
         return {
+          standard_id: null,
+          preparation_id: ing.preparation_id,
           name: `${ing.preparations.name} (prep)`,
           qty: Number(ing.quantity_needed),
           unitCost: parseFloat(costPerUnit.toFixed(4)),
@@ -195,6 +199,7 @@ export const getMenuById = async (req: any, res: Response) => {
         };
       }
 
+      // Case 2: standard ingredient
       const name = ing.standard_ingredients?.name || 'Unknown Ingredient';
       const uom = ing.standard_ingredients?.unit_of_measure || 'PZ';
       const qty = Number(ing.quantity_needed);
@@ -202,13 +207,14 @@ export const getMenuById = async (req: any, res: Response) => {
       const total = qty * unitCost;
       totalCost += total;
       return {
+        standard_id: ing.standard_id,
+        preparation_id: null,
         name: `${name} (${uom})`,
         qty,
         unitCost: parseFloat(unitCost.toFixed(4)),
         total: parseFloat(total.toFixed(4))
       };
-    });
-
+    }); 
     const sellingPrice = Number(dish.selling_price) || 0;
     const profitMargin = sellingPrice - totalCost;
     const foodCostPercent = sellingPrice > 0
@@ -273,7 +279,9 @@ export const getAvailableIngredients = async (req: any, res: Response) => {
 // 4. Save or update a dish recipe + log history snapshot
 export const saveDishRecipe = async (req: any, res: Response) => {
   const userId = req.user?.id;
-  const { dishId, name, category, sellingPrice, recipeItems } = req.body;
+  const { name, category, sellingPrice, recipeItems } = req.body;
+  const dishId = req.params.id || req.body.dishId;
+
 
   try {
     let currentDishId = dishId;

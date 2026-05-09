@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import { getTranslation, DEFAULT_LOCALE } from '@/lib/i18n';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -33,6 +34,13 @@ export default function RecipeBuilder({ mode, existingData, onSave, isSaving }: 
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [availableItems, setAvailableItems] = useState<IngredientOption[]>([]);
+  const [locale, setLocale] = useState<'en' | 'it' | 'fr' | 'de'>(DEFAULT_LOCALE);
+  const t = (key: string) => getTranslation(locale, key);
+
+  useEffect(() => {
+    const stored = localStorage.getItem('locale');
+    if (stored) setLocale(stored as any);
+  }, []);
 
   // Dish fields
   const [dishName, setDishName] = useState('');
@@ -125,19 +133,19 @@ export default function RecipeBuilder({ mode, existingData, onSave, isSaving }: 
 
   const handleSave = async () => {
     if (!dishName.trim()) {
-      alert(mode === 'dish' ? 'Inserisci il nome del piatto' : 'Inserisci il nome della preparazione');
+      alert(mode === 'dish' ? t('alertDishNameRequired') : t('alertPreparationNameRequired'));
       return;
     }
     if (mode === 'dish' && !sellingPrice) {
-      alert('Inserisci il prezzo di vendita');
+      alert(t('alertSellingPriceRequired'));
       return;
     }
     if (mode === 'preparation' && (!yieldQuantity || Number(yieldQuantity) <= 0)) {
-      alert('Inserisci la resa della preparazione');
+      alert(t('alertYieldRequired'));
       return;
     }
     if (recipeItems.filter(r => r.item_id).length === 0) {
-      alert('Aggiungi almeno un ingrediente');
+      alert(t('alertAtLeastOneIngredient'));
       return;
     }
 
@@ -171,7 +179,7 @@ export default function RecipeBuilder({ mode, existingData, onSave, isSaving }: 
 
   if (isLoading) return (
     <div className="p-8 text-center text-slate-400">
-      <i className="fas fa-spinner fa-spin mr-2"></i> Caricamento builder...
+      <i className="fas fa-spinner fa-spin mr-2"></i> {t('loadingBuilder')}
     </div>
   );
 
@@ -186,13 +194,13 @@ export default function RecipeBuilder({ mode, existingData, onSave, isSaving }: 
               onClick={() => router.back()}
               className="text-slate-400 hover:text-slate-600 text-sm font-bold mb-2 flex items-center"
             >
-              <i className="fas fa-arrow-left mr-2"></i> Indietro
+              <i className="fas fa-arrow-left mr-2"></i> {t('back')}
             </button>
             <h1 className="text-3xl font-black text-slate-800 flex items-center">
               <i className={`fas ${mode === 'dish' ? 'fa-utensils' : 'fa-flask'} mr-3 text-indigo-500`}></i>
               {existingData
-                ? (mode === 'dish' ? 'Modifica Piatto' : 'Modifica Preparazione')
-                : (mode === 'dish' ? 'Nuovo Piatto' : 'Nuova Preparazione')
+                ? (mode === 'dish' ? t('editDish') : t('editPreparation'))
+                : (mode === 'dish' ? t('newDish') : t('newPreparationBuilder'))
               }
             </h1>
           </div>
@@ -202,26 +210,26 @@ export default function RecipeBuilder({ mode, existingData, onSave, isSaving }: 
             disabled={isSaving}
             className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-bold transition-colors shadow-sm disabled:opacity-50"
           >
-            {isSaving ? 'Salvataggio...' : 'Salva'}
+            {isSaving ? t('savingEllipsis') : t('save')}
           </button>
         </div>
 
         {/* BASE DETAILS */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-6">
           <h2 className="text-sm font-black text-slate-400 uppercase tracking-widest mb-4">
-            Dettagli Base
+            {t('baseDetails')}
           </h2>
           <div className="grid grid-cols-3 gap-6">
 
             <div className="col-span-2">
               <label className="block text-sm font-bold text-slate-700 mb-2">
-                {mode === 'dish' ? 'Nome Piatto *' : 'Nome Preparazione *'}
+                {mode === 'dish' ? t('dishNameLabel') : t('preparationNameLabel')}
               </label>
               <input
                 type="text"
                 value={dishName}
                 onChange={e => setDishName(e.target.value)}
-                placeholder={mode === 'dish' ? 'es. Spaghetti alla Carbonara' : 'es. Fumetto di Pesce'}
+                placeholder={mode === 'dish' ? t('dishNamePlaceholder') : t('preparationNamePlaceholder')}
                 className="w-full border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500"
               />
             </div>
@@ -229,7 +237,7 @@ export default function RecipeBuilder({ mode, existingData, onSave, isSaving }: 
             {mode === 'dish' && (
               <>
                 <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-2">Categoria</label>
+                  <label className="block text-sm font-bold text-slate-700 mb-2">{t('category')}</label>
                   <select
                     value={category}
                     onChange={e => setCategory(e.target.value)}
@@ -243,7 +251,7 @@ export default function RecipeBuilder({ mode, existingData, onSave, isSaving }: 
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-2">Prezzo di Vendita (€) *</label>
+                  <label className="block text-sm font-bold text-slate-700 mb-2">{t('sellingPriceLabel')}</label>
                   <input
                     type="number"
                     value={sellingPrice}
@@ -258,7 +266,7 @@ export default function RecipeBuilder({ mode, existingData, onSave, isSaving }: 
             {mode === 'preparation' && (
               <>
                 <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-2">Resa (Yield) *</label>
+                  <label className="block text-sm font-bold text-slate-700 mb-2">{t('yieldLabel')}</label>
                   <input
                     type="number"
                     value={yieldQuantity}
@@ -268,7 +276,7 @@ export default function RecipeBuilder({ mode, existingData, onSave, isSaving }: 
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-2">Unità di Misura</label>
+                  <label className="block text-sm font-bold text-slate-700 mb-2">{t('unitOfMeasureLabel')}</label>
                   <select
                     value={yieldUom}
                     onChange={e => setYieldUom(e.target.value)}
@@ -288,21 +296,21 @@ export default function RecipeBuilder({ mode, existingData, onSave, isSaving }: 
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-sm font-black text-slate-400 uppercase tracking-widest">
-              {mode === 'dish' ? 'Ingredienti della Ricetta' : 'Ingredienti della Preparazione'}
+              {mode === 'dish' ? t('recipeIngredientsLabel') : t('preparationIngredientsLabel')}
             </h2>
             <button
               type="button"
               onClick={addRow}
               className="text-indigo-600 font-bold hover:text-indigo-800 text-sm"
             >
-              <i className="fas fa-plus mr-1"></i> Aggiungi Ingrediente
+              <i className="fas fa-plus mr-1"></i> {t('addIngredient')}
             </button>
           </div>
 
           <div className="space-y-3">
             {recipeItems.length === 0 ? (
               <div className="text-center py-8 bg-slate-50 rounded-xl border border-dashed border-slate-300 text-slate-500">
-                Nessun ingrediente. Clicca su "Aggiungi Ingrediente" per iniziare.
+                {t('noIngredientsAdded')}
               </div>
             ) : (
               recipeItems.map((item, index) => {
@@ -321,8 +329,8 @@ export default function RecipeBuilder({ mode, existingData, onSave, isSaving }: 
                         onChange={e => updateRow(item.id, 'item_id', e.target.value)}
                         className="w-full border border-slate-300 rounded-lg px-4 py-2 font-medium"
                       >
-                        <option value="">-- Seleziona ingrediente --</option>
-                        <optgroup label="Ingredienti Base">
+                        <option value="">{t('selectIngredient')}</option>
+                        <optgroup label={t('baseIngredientsGroup')}>
                           {availableItems.filter(i => i.type === 'standard').map(ing => (
                             <option key={ing.id} value={ing.id}>
                               {ing.name} ({ing.unit_of_measure}) — €{Number(ing.current_price || 0).toFixed(4)}/{ing.unit_of_measure}
@@ -330,7 +338,7 @@ export default function RecipeBuilder({ mode, existingData, onSave, isSaving }: 
                           ))}
                         </optgroup>
                         {mode === 'dish' && availableItems.some(i => i.type === 'preparation') && (
-                          <optgroup label="Semilavorati (Preparazioni)">
+                          <optgroup label={t('preparationsGroup')}>
                             {availableItems.filter(i => i.type === 'preparation').map(prep => (
                               <option key={prep.id} value={prep.id}>
                                 [PREP] {prep.name} ({prep.yield_uom})
@@ -344,7 +352,7 @@ export default function RecipeBuilder({ mode, existingData, onSave, isSaving }: 
                     <div className="w-32">
                       <input
                         type="number"
-                        placeholder="Quantità"
+                        placeholder={t('quantityPlaceholder')}
                         value={item.quantity_needed}
                         onChange={e => updateRow(item.id, 'quantity_needed', e.target.value)}
                         className="w-full border border-slate-300 rounded-lg px-4 py-2 text-right"
@@ -377,13 +385,13 @@ export default function RecipeBuilder({ mode, existingData, onSave, isSaving }: 
             <div className="mt-6 pt-4 border-t border-slate-100">
               <div className="flex justify-between items-center">
                 <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">
-                  {mode === 'dish' ? 'Costo di Produzione Stimato' : `Costo Totale (per ${yieldQuantity || '?'} ${yieldUom})`}
+                  {mode === 'dish' ? t('estimatedProductionCost') : `${t('estimatedTotalCost')} (${t('costPerUnit')} ${yieldQuantity || '?'} ${yieldUom})`}
                 </span>
                 <span className="text-2xl font-black text-slate-800">€ {liveCost.toFixed(3)}</span>
               </div>
               {mode === 'dish' && sellingPrice && (
                 <div className="flex justify-between items-center mt-2">
-                  <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">Margine Stimato</span>
+                  <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('estimatedMargin')}</span>
                   <span className={`text-xl font-black ${Number(sellingPrice) - liveCost > 0 ? 'text-emerald-600' : 'text-red-500'}`}>
                     € {(Number(sellingPrice) - liveCost).toFixed(3)}
                   </span>
@@ -392,7 +400,7 @@ export default function RecipeBuilder({ mode, existingData, onSave, isSaving }: 
               {mode === 'preparation' && yieldQuantity && Number(yieldQuantity) > 0 && (
                 <div className="flex justify-between items-center mt-2">
                   <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">
-                    Costo per {yieldUom}
+                    {t('costPerUnit')} {yieldUom}
                   </span>
                   <span className="text-xl font-black text-indigo-600">
                     € {(liveCost / Number(yieldQuantity)).toFixed(4)} / {yieldUom}
