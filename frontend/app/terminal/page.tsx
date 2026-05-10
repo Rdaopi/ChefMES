@@ -63,7 +63,7 @@ function PriceHistoryChart({ data, contractPrice, uom }: {
 }) {
   if (data.length < 2) return (
     <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 text-sm text-slate-400 italic">
-      Storico insufficiente — carica più fatture per vedere il trend.
+      {t('insufficientPriceHistory')}
     </div>
   );
   const prices = data.map(d => d.price);
@@ -74,7 +74,7 @@ function PriceHistoryChart({ data, contractPrice, uom }: {
   return (
     <div className="px-6 py-5 bg-slate-50 border-t border-slate-100">
       <p className="text-xs font-black text-slate-400 uppercase tracking-wider mb-3">
-        Storico Prezzi ({data.length} rilevazioni)
+        {t('priceHistory')} ({data.length} {t('observations')})
       </p>
       <ResponsiveContainer width="100%" height={140}>
         <LineChart data={data} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
@@ -94,7 +94,7 @@ function PriceHistoryChart({ data, contractPrice, uom }: {
           <Tooltip
             formatter={(value) => {
               const num = Number(value ?? 0);
-              return [`€ ${num.toFixed(4)} / ${uom}`, 'Prezzo'];
+              return [`€ ${num.toFixed(4)} / ${uom}`, t('price')];
             }}
             labelFormatter={(d) => new Date(d).toLocaleDateString('it-IT', {
               day: '2-digit', month: 'long', year: 'numeric'
@@ -110,7 +110,7 @@ function PriceHistoryChart({ data, contractPrice, uom }: {
             stroke="#94a3b8"
             strokeDasharray="4 2"
             label={{
-              value: 'Prezzo iniziale',
+              value: t('initialPrice'),
               position: 'insideTopRight',
               fontSize: 10,
               fill: '#94a3b8'
@@ -222,14 +222,14 @@ export default function TradingTerminalPage() {
     },
     {
       key: 'priceHistory',
-      header: 'Storico',
+      header: t('priceHistory'),
       render: (row: TerminalItem) => (
         <Sparkline data={row.priceHistory || []} trendDirection={row.trendDirection} />
       )
     },
     {
       key: 'status',
-      header: 'Status',
+      header: t('status'),
       render: (row: TerminalItem) => (
         <span className={`text-xs font-bold px-3 py-1.5 rounded-full border ${
           row.status === 'Opportunity' ? 'bg-emerald-100 text-emerald-800 border-emerald-300' :
@@ -256,7 +256,7 @@ export default function TradingTerminalPage() {
           <p className="text-slate-500 text-sm mt-1">{t('liveMarketMonitoring')}</p>
         </div>
         <span className="px-3 py-1.5 bg-red-100 text-red-600 text-xs font-bold rounded-full animate-pulse border border-red-200">
-          <i className="fas fa-circle text-[8px] mr-2"></i>LIVE
+          <i className="fas fa-circle text-[8px] mr-2"></i>{t('live')}
         </span>
       </header>
 
@@ -289,7 +289,7 @@ export default function TradingTerminalPage() {
         columns={columns}
         data={filtered}
         isLoading={isLoading}
-        emptyMessage="Nessun ingrediente trovato. Importa delle fatture per iniziare."
+        emptyMessage={t('noIngredientsFound')}
         emptyIcon="fa-chart-line"
         keyExtractor={row => row.id}
         onRowClick={row => setExpandedId(prev => prev === row.id ? null : row.id)}

@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
+import { useTranslations } from '@/components/LanguageProvider';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -24,6 +25,7 @@ export default function TerminalStats() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [editing, setEditing] = useState<EditingField | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const { t } = useTranslations();
 
   const fetchStats = async () => {
     try {
@@ -104,7 +106,7 @@ const foodCostDiff = avgFoodCost - targetFoodCost;
       <div className="flex items-center gap-3 bg-white border border-slate-200 rounded-xl px-4 py-3 shadow-sm flex-1 min-w-[180px]">
         <i className="fas fa-receipt text-slate-400 text-sm"></i>
         <div>
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Spesa Mensile</p>
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t('monthlySpendLabel')}</p>
           <div className="flex items-baseline gap-2">
             <span className="text-lg font-black text-slate-800">
               € {monthlySpend.toLocaleString('it-IT', { minimumFractionDigits: 0 })}
@@ -132,7 +134,7 @@ const foodCostDiff = avgFoodCost - targetFoodCost;
       <div className="flex items-center gap-3 bg-white border border-slate-200 rounded-xl px-4 py-3 shadow-sm flex-1 min-w-[180px]">
         <i className={`fas fa-chart-line text-sm ${marginDiff >= 0 ? 'text-emerald-500' : 'text-red-500'}`}></i>
         <div>
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Margine Attuale</p>
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t('currentMargin')}</p>
           <div className="flex items-baseline gap-2">
             <span className={`text-lg font-black ${marginDiff >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
               {currentMargin.toFixed(1)}%
@@ -178,7 +180,7 @@ const foodCostDiff = avgFoodCost - targetFoodCost;
       <div className="flex items-center gap-3 bg-white border border-slate-200 rounded-xl px-4 py-3 shadow-sm flex-1 min-w-[180px]">
         <i className={`fas fa-utensils text-sm ${foodCostDiff <= 0 ? 'text-emerald-500' : 'text-red-500'}`}></i>
         <div>
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Food Cost</p>
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t('foodCostLabel')}</p>
           <div className="flex items-baseline gap-2">
             <span className={`text-lg font-black ${foodCostDiff <= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
               {avgFoodCost.toFixed(1)}%
@@ -226,13 +228,13 @@ const foodCostDiff = avgFoodCost - targetFoodCost;
           stats.dogsCount > 0 ? 'text-red-500' : 'text-slate-300'
         }`}></i>
         <div>
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Piatti a Rischio</p>
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t('dishesCostRisk')}</p>
           <span className={`text-lg font-black ${
             stats.dogsCount > 0 ? 'text-red-600' : 'text-emerald-600'
           }`}>
             {stats.dogsCount ?? 0}
           </span>
-          <span className="text-xs text-slate-400 ml-1">/ {stats.totalDishes ?? 0} piatti</span>
+          <span className="text-xs text-slate-400 ml-1">/ {stats.totalDishes ?? 0} {t('dishes')}</span>
         </div>
       </div>
 

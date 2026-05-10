@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-
+import { useTranslations } from './LanguageProvider';
 
 interface Column<T> {
   key: keyof T | string;
@@ -25,14 +25,14 @@ export default function DataTable<T>({
   columns,
   data,
   isLoading = false,
-  emptyMessage = 'Nessun dato disponibile.',
+  emptyMessage = 'No data available.',
   emptyIcon = 'fa-table',
   onRowClick,
   keyExtractor,
   expandedId,
-  renderExpanded
+  renderExpanded,
 }: DataTableProps<T>) {
-
+  const { t } = useTranslations();
   return (
     <div className="bg-white shadow-sm rounded-2xl border border-slate-200 overflow-hidden flex flex-col min-h-0">
     <div className="overflow-x-auto overflow-y-auto flex-1">
@@ -57,7 +57,7 @@ export default function DataTable<T>({
             {isLoading ? (
               <tr>
                 <td colSpan={columns.length} className="text-center py-12 text-slate-400">
-                  <i className="fas fa-spinner fa-spin mr-2"></i> Caricamento...
+                  <i className="fas fa-spinner fa-spin mr-2"></i> {t('loadingData')}
                 </td>
               </tr>
             ) : data.length === 0 ? (

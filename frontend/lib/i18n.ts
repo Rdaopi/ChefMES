@@ -234,6 +234,15 @@ const translations: Record<Locale, Record<string, string>> = {
     editDishButton: 'Edit Dish',
     productionCost: 'Production Cost',
     totalIngredientsLabel: 'Total Ingredients Cost',
+    
+    // Terminal Stats
+    monthlySpendLabel: 'Monthly Spend',
+    editBudget: 'Edit budget',
+    currentMargin: 'Current Margin',
+    targetLabel: 'target:',
+    maxLabel: 'max:',
+    dishesCostRisk: 'At-Risk Dishes',
+    dishes: 'dishes',
   },
   it: {
     appName: 'ChefMES',
@@ -459,6 +468,15 @@ const translations: Record<Locale, Record<string, string>> = {
     editDishButton: 'Modifica Ricetta',
     productionCost: 'Costo Produzione',
     totalIngredientsLabel: 'Costo Totale Ingredienti',
+    
+    // Terminal Stats
+    monthlySpendLabel: 'Spesa Mensile',
+    editBudget: 'Modifica budget',
+    currentMargin: 'Margine Attuale',
+    targetLabel: 'obiettivo:',
+    maxLabel: 'max:',
+    dishesCostRisk: 'Piatti a Rischio',
+    dishes: 'piatti',
   },
   fr: {
     appName: 'ChefMES',
