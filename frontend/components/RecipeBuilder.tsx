@@ -230,7 +230,7 @@ export default function RecipeBuilder({ mode, existingData, onSave, isSaving }: 
                 value={dishName}
                 onChange={e => setDishName(e.target.value)}
                 placeholder={mode === 'dish' ? t('dishNamePlaceholder') : t('preparationNamePlaceholder')}
-                className="w-full border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500"
+                className="w-full border border-slate-300 rounded-lg px-4 py-2 text-slate-900 focus:ring-2 focus:ring-indigo-500"
               />
             </div>
 
@@ -241,7 +241,7 @@ export default function RecipeBuilder({ mode, existingData, onSave, isSaving }: 
                   <select
                     value={category}
                     onChange={e => setCategory(e.target.value)}
-                    className="w-full border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500"
+                    className="w-full border border-slate-300 rounded-lg px-4 py-2 text-slate-900 focus:ring-2 focus:ring-indigo-500"
                   >
                     <option value="Antipasti">Antipasti</option>
                     <option value="Primi">Primi</option>
@@ -257,7 +257,7 @@ export default function RecipeBuilder({ mode, existingData, onSave, isSaving }: 
                     value={sellingPrice}
                     onChange={e => setSellingPrice(e.target.value)}
                     placeholder="0.00"
-                    className="w-full border border-slate-300 rounded-lg px-4 py-2 font-bold text-emerald-600 focus:ring-2 focus:ring-indigo-500"
+                    className="w-full border border-slate-300 rounded-lg px-4 py-2 text-slate-900 font-bold text-emerald-600 focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
               </>
@@ -272,7 +272,7 @@ export default function RecipeBuilder({ mode, existingData, onSave, isSaving }: 
                     value={yieldQuantity}
                     onChange={e => setYieldQuantity(e.target.value)}
                     placeholder="es. 3"
-                    className="w-full border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500"
+                    className="w-full border border-slate-300 rounded-lg px-4 py-2 text-slate-900 focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
                 <div>
@@ -280,7 +280,7 @@ export default function RecipeBuilder({ mode, existingData, onSave, isSaving }: 
                   <select
                     value={yieldUom}
                     onChange={e => setYieldUom(e.target.value)}
-                    className="w-full border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500"
+                    className="w-full border border-slate-300 rounded-lg px-4 py-2 text-slate-900 focus:ring-2 focus:ring-indigo-500"
                   >
                     <option value="KG">KG</option>
                     <option value="L">L</option>
@@ -327,7 +327,7 @@ export default function RecipeBuilder({ mode, existingData, onSave, isSaving }: 
                       <select
                         value={item.item_id}
                         onChange={e => updateRow(item.id, 'item_id', e.target.value)}
-                        className="w-full border border-slate-300 rounded-lg px-4 py-2 font-medium"
+                        className="w-full border border-slate-300 rounded-lg px-4 py-2 text-slate-900 font-medium"
                       >
                         <option value="">{t('selectIngredient')}</option>
                         <optgroup label={t('baseIngredientsGroup')}>
@@ -355,7 +355,7 @@ export default function RecipeBuilder({ mode, existingData, onSave, isSaving }: 
                         placeholder={t('quantityPlaceholder')}
                         value={item.quantity_needed}
                         onChange={e => updateRow(item.id, 'quantity_needed', e.target.value)}
-                        className="w-full border border-slate-300 rounded-lg px-4 py-2 text-right"
+                        className="w-full border border-slate-300 rounded-lg px-4 py-2 text-right text-slate-900"
                       />
                     </div>
 
