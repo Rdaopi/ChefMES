@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import RecipeBuilder from '@/components/RecipeBuilder';
+import { useTranslations } from '@/components/LanguageProvider';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -11,6 +12,7 @@ function PreparationBuilderContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const editId = searchParams.get('id');
+  const { t } = useTranslations();
   const [isSaving, setIsSaving] = useState(false);
   const [existingData, setExistingData] = useState(null);
   const [isLoading, setIsLoading] = useState(!!editId);
@@ -52,7 +54,7 @@ function PreparationBuilderContent() {
       router.push(editId ? `/preparations/${editId}` : '/preparations');
     } catch (error) {
       console.error('Save error:', error);
-      alert('Errore durante il salvataggio');
+      alert(t('errorSaving'));
     } finally {
       setIsSaving(false);
     }
@@ -60,7 +62,7 @@ function PreparationBuilderContent() {
 
   if (isLoading) return (
     <div className="p-8 text-center text-slate-400">
-      <i className="fas fa-spinner fa-spin mr-2"></i> Caricamento...
+      <i className="fas fa-spinner fa-spin mr-2"></i> {t('loading')}
     </div>
   );
 

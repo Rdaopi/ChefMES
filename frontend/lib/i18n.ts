@@ -223,6 +223,17 @@ const translations: Record<Locale, Record<string, string>> = {
     totalSavings: 'Total Savings',
     vsTargetBudget: 'vs Target Budget',
     savingsPerUnit: 'Savings/Unit',
+    
+    // Detail Pages
+    prepNotFound: 'Preparation not found',
+    backToPreparations: 'Back to Preparations',
+    editPreparationButton: 'Edit Preparation',
+    numberOfIngredients: 'Number of Ingredients',
+    ingredients: 'Ingredients',
+    unitCost: 'Unit Cost',
+    editDishButton: 'Edit Dish',
+    productionCost: 'Production Cost',
+    totalIngredientsLabel: 'Total Ingredients Cost',
   },
   it: {
     appName: 'ChefMES',
@@ -437,6 +448,17 @@ const translations: Record<Locale, Record<string, string>> = {
     totalSavings: 'Risparmi Totali',
     vsTargetBudget: 'vs Budget Target',
     savingsPerUnit: 'Risparmi/Unità',
+    
+    // Detail Pages
+    prepNotFound: 'Preparazione non trovata',
+    backToPreparations: 'Torna alle Preparazioni',
+    editPreparationButton: 'Modifica Preparazione',
+    numberOfIngredients: 'N. Ingredienti',
+    ingredients: 'Ingredienti',
+    unitCost: 'Costo Unit.',
+    editDishButton: 'Modifica Ricetta',
+    productionCost: 'Costo Produzione',
+    totalIngredientsLabel: 'Costo Totale Ingredienti',
   },
   fr: {
     appName: 'ChefMES',
@@ -651,6 +673,17 @@ const translations: Record<Locale, Record<string, string>> = {
     totalSavings: 'Économies Totales',
     vsTargetBudget: 'vs Budget Cible',
     savingsPerUnit: 'Économies/Unité',
+    
+    // Detail Pages
+    prepNotFound: 'Préparation non trouvée',
+    backToPreparations: 'Retour aux Préparations',
+    editPreparationButton: 'Modifier Préparation',
+    numberOfIngredients: 'Nombre d\'Ingrédients',
+    ingredients: 'Ingrédients',
+    unitCost: 'Coût Unitaire',
+    editDishButton: 'Modifier la Recette',
+    productionCost: 'Coût de Production',
+    totalIngredientsLabel: 'Coût Total des Ingrédients',
   },
   de: {
     appName: 'ChefMES',
@@ -865,6 +898,17 @@ const translations: Record<Locale, Record<string, string>> = {
     totalSavings: 'Gesamteinsparungen',
     vsTargetBudget: 'vs Zielbudget',
     savingsPerUnit: 'Einsparungen/Einheit',
+    
+    // Detail Pages
+    prepNotFound: 'Vorbereitung nicht gefunden',
+    backToPreparations: 'Zurück zu den Vorbereitungen',
+    editPreparationButton: 'Vorbereitung bearbeiten',
+    numberOfIngredients: 'Anzahl der Zutaten',
+    ingredients: 'Zutaten',
+    unitCost: 'Stückkosten',
+    editDishButton: 'Rezept bearbeiten',
+    productionCost: 'Produktionskosten',
+    totalIngredientsLabel: 'Gesamtkosten der Zutaten',
   },
 };
 

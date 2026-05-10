@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
+import { useTranslations } from '@/components/LanguageProvider';
 
 interface PrepIngredient {
   id: string;
@@ -31,6 +32,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 function PreparationDetailContent() {
   const { id } = useParams();
   const router = useRouter();
+  const { t } = useTranslations();
   const [prep, setPrep] = useState<PreparationDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -69,11 +71,11 @@ function PreparationDetailContent() {
       <main className="p-8 max-w-4xl mx-auto text-center" role="alert">
         <div className="inline-flex items-center justify-center p-6 bg-red-50 text-red-600 rounded-xl">
           <i className="fas fa-exclamation-circle mr-3 text-xl"></i>
-          <span className="font-medium">Preparazione non trovata</span>
+          <span className="font-medium">{t('prepNotFound')}</span>
         </div>
         <div className="mt-6">
           <Link href="/preparations" className="text-blue-600 hover:underline">
-            Torna alle Preparazioni
+            {t('backToPreparations')}
           </Link>
         </div>
       </main>
@@ -90,14 +92,14 @@ function PreparationDetailContent() {
           className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium transition-colors"
         >
           <i className="fas fa-arrow-left mr-2"></i>
-          Torna alle Preparazioni
+          {t('backToPreparations')}
         </Link>
         <button
           type="button"
           onClick={() => router.push(`/preparations/builder?id=${prep.id}`)}
           className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl font-bold text-sm transition-colors shadow-sm flex items-center"
         >
-          <i className="fas fa-edit mr-2"></i> Modifica Preparazione
+          <i className="fas fa-edit mr-2"></i> {t('editPreparationButton')}
         </button>
       </div>
 
@@ -111,7 +113,7 @@ function PreparationDetailContent() {
               {prep.name}
             </h1>
             <p className="text-slate-500 font-medium mt-1">
-              Resa: <span className="font-bold text-slate-700">{prep.yieldQuantity} {prep.yieldUom}</span>
+              {t('yieldLabel')}: <span className="font-bold text-slate-700">{prep.yieldQuantity} {prep.yieldUom}</span>
             </p>
           </div>
         </header>
@@ -119,31 +121,31 @@ function PreparationDetailContent() {
         {/* SUMMARY CARDS */}
         <section className="grid grid-cols-1 sm:grid-cols-3 gap-0 p-0 sm:p-6 bg-slate-50 border-b border-slate-100 divide-y sm:divide-y-0 sm:divide-x divide-slate-200">
           <div className="text-center p-4 sm:p-0">
-            <p className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Costo Totale</p>
+            <p className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">{t('totalCost')}</p>
             <p className="text-2xl font-black text-red-600">€ {prep.totalCost.toFixed(3)}</p>
           </div>
           <div className="text-center p-4 sm:p-0">
-            <p className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Costo per {prep.yieldUom}</p>
+            <p className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">{t('costPerUnit')} {prep.yieldUom}</p>
             <p className="text-2xl font-black text-indigo-600">€ {prep.costPerUnit.toFixed(4)}</p>
           </div>
           <div className="text-center p-4 sm:p-0">
-            <p className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">N. Ingredienti</p>
+            <p className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">{t('numberOfIngredients')}</p>
             <p className="text-2xl font-black text-slate-800">{prep.ingredients.length}</p>
           </div>
         </section>
 
         {/* INGREDIENTS TABLE */}
         <section className="p-6">
-          <h2 className="text-lg font-black text-slate-800 mb-4">Ingredienti</h2>
+          <h2 className="text-lg font-black text-slate-800 mb-4">{t('ingredients')}</h2>
           <div className="overflow-x-auto rounded-lg border border-slate-200">
             <table className="min-w-full divide-y divide-slate-200 text-sm">
               <thead className="bg-slate-50">
                 <tr className="text-xs font-black text-slate-500 uppercase tracking-wider">
-                  <th scope="col" className="text-left py-3 px-4">Ingrediente</th>
+                  <th scope="col" className="text-left py-3 px-4">{t('ingredient')}</th>
                   <th scope="col" className="text-left py-3 px-4">UOM</th>
-                  <th scope="col" className="text-right py-3 px-4">Quantità</th>
-                  <th scope="col" className="text-right py-3 px-4">Costo Unit.</th>
-                  <th scope="col" className="text-right py-3 px-4">Totale</th>
+                  <th scope="col" className="text-right py-3 px-4">{t('qty')}</th>
+                  <th scope="col" className="text-right py-3 px-4">{t('unitCost')}</th>
+                  <th scope="col" className="text-right py-3 px-4">{t('totalCost')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 bg-white">
@@ -160,7 +162,7 @@ function PreparationDetailContent() {
               <tfoot className="bg-slate-50 border-t-2 border-slate-200">
                 <tr>
                   <td colSpan={4} className="py-3 px-4 text-sm font-black text-slate-600 uppercase tracking-wider">
-                    Costo Totale Preparazione
+                    {t('totalIngredientsLabel')}
                   </td>
                   <td className="py-3 px-4 text-right font-black text-red-500 text-lg">
                     € {prep.totalCost.toFixed(3)}

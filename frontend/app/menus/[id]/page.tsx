@@ -100,7 +100,7 @@ function DishDetailContent() {
           onClick={() => router.push(`/menus/builder?id=${dish.id}`)}
           className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl font-bold text-sm transition-colors shadow-sm flex items-center"
         >
-          <i className="fas fa-edit mr-2"></i> Modifica Ricetta
+          <i className="fas fa-edit mr-2"></i> {t('editDishButton')}
         </button>
       </div>
 
@@ -164,7 +164,7 @@ function DishDetailContent() {
               <tfoot className="bg-slate-50 border-t-2 border-slate-200">
                 <tr>
                   <td colSpan={3} className="py-3 px-4 text-sm font-black text-slate-600 uppercase tracking-wider">
-                    Costo Totale Ingredienti
+                    {t('totalIngredientsLabel')}
                   </td>
                   <td className="py-3 px-4 text-right font-black text-red-500">
                     € {dish.totalCost.toFixed(4)}
