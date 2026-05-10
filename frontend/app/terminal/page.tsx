@@ -277,7 +277,7 @@ export default function TradingTerminalPage() {
             }`}
           >
             {f === 'all'
-              ? `t('all') (${items.length})`
+              ? `${t('all')} (${items.length})`
               : `${t(f)} (${items.filter(i => i.status === f).length})`
             }
           </button>
