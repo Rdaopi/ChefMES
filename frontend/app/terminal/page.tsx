@@ -162,7 +162,7 @@ export default function TradingTerminalPage() {
   const columns = [
     {
       key: 'ingredient',
-      header: 'Ingrediente',
+      header: t('ingredient'),
       render: (row: TerminalItem) => (
         <div className="flex items-center gap-2">
           <i className={`fas fa-chevron-${expandedId === row.id ? 'down' : 'right'} text-xs text-slate-300`}></i>
@@ -175,14 +175,14 @@ export default function TradingTerminalPage() {
     },
     {
       key: 'supplier',
-      header: 'Fornitore',
+      header: t('supplier'),
       render: (row: TerminalItem) => (
         <span className="text-sm text-slate-500">{row.supplier}</span>
       )
     },
     {
       key: 'contractPrice',
-      header: 'Prezzo Iniziale',
+      header: t('initialPrice'),
       align: 'right' as const,
       render: (row: TerminalItem) => (
         <span className="text-sm font-mono text-slate-500">
@@ -192,7 +192,7 @@ export default function TradingTerminalPage() {
     },
     {
       key: 'livePrice',
-      header: 'Prezzo Attuale',
+      header: t('livePrice'),
       align: 'right' as const,
       render: (row: TerminalItem) => (
         <span className={`text-sm font-black font-mono ${
@@ -206,7 +206,7 @@ export default function TradingTerminalPage() {
     },
     {
       key: 'trend',
-      header: 'Var. Recente',
+      header: t('recentTrend'),
       render: (row: TerminalItem) => (
         <span className={`inline-flex items-center font-bold px-2 py-1 rounded text-xs ${
           row.trendDirection === 'up' ? 'text-red-600 bg-red-50' :
