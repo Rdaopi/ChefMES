@@ -92,7 +92,10 @@ function PriceHistoryChart({ data, contractPrice, uom }: {
             width={55}
           />
           <Tooltip
-            formatter={(value: number) => [`€ ${value.toFixed(4)} / ${uom}`, 'Prezzo']}
+            formatter={(value) => {
+              const num = Number(value ?? 0);
+              return [`€ ${num.toFixed(4)} / ${uom}`, 'Prezzo'];
+            }}
             labelFormatter={d => new Date(d).toLocaleDateString('it-IT', {
               day: '2-digit', month: 'long', year: 'numeric'
             })}
