@@ -178,7 +178,7 @@ export default function RecipeBuilder({ mode, existingData, onSave, isSaving }: 
   };
 
   if (isLoading) return (
-    <div className="p-8 text-center text-slate-400">
+    <div className="p-8 text-center text-slate-900">
       <i className="fas fa-spinner fa-spin mr-2"></i> {t('loadingBuilder')}
     </div>
   );
@@ -192,7 +192,7 @@ export default function RecipeBuilder({ mode, existingData, onSave, isSaving }: 
           <div>
             <button
               onClick={() => router.back()}
-              className="text-slate-400 hover:text-slate-600 text-sm font-bold mb-2 flex items-center"
+              className="text-slate-900 hover:text-slate-600 text-sm font-bold mb-2 flex items-center"
             >
               <i className="fas fa-arrow-left mr-2"></i> {t('back')}
             </button>
@@ -216,7 +216,7 @@ export default function RecipeBuilder({ mode, existingData, onSave, isSaving }: 
 
         {/* BASE DETAILS */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-6">
-          <h2 className="text-sm font-black text-slate-400 uppercase tracking-widest mb-4">
+          <h2 className="text-sm font-black text-slate-900 uppercase tracking-widest mb-4">
             {t('baseDetails')}
           </h2>
           <div className="grid grid-cols-3 gap-6">
@@ -295,7 +295,7 @@ export default function RecipeBuilder({ mode, existingData, onSave, isSaving }: 
         {/* RECIPE LINES */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-sm font-black text-slate-400 uppercase tracking-widest">
+            <h2 className="text-sm font-black text-slate-900 uppercase tracking-widest">
               {mode === 'dish' ? t('recipeIngredientsLabel') : t('preparationIngredientsLabel')}
             </h2>
             <button
@@ -309,7 +309,7 @@ export default function RecipeBuilder({ mode, existingData, onSave, isSaving }: 
 
           <div className="space-y-3">
             {recipeItems.length === 0 ? (
-              <div className="text-center py-8 bg-slate-50 rounded-xl border border-dashed border-slate-300 text-slate-500">
+              <div className="text-center py-8 bg-slate-50 rounded-xl border border-dashed border-slate-300 text-slate-900">
                 {t('noIngredientsAdded')}
               </div>
             ) : (
@@ -321,7 +321,7 @@ export default function RecipeBuilder({ mode, existingData, onSave, isSaving }: 
 
                 return (
                   <div key={item.id} className="flex items-center gap-4 bg-slate-50 p-3 rounded-xl border border-slate-100">
-                    <div className="w-8 text-center font-bold text-slate-400">{index + 1}</div>
+                    <div className="w-8 text-center font-bold text-slate-900">{index + 1}</div>
 
                     <div className="flex-1">
                       <select
@@ -359,10 +359,10 @@ export default function RecipeBuilder({ mode, existingData, onSave, isSaving }: 
                       />
                     </div>
 
-                    <div className="w-12 text-sm font-bold text-slate-400 text-center">{uom}</div>
+                    <div className="w-12 text-sm font-bold text-slate-900 text-center">{uom}</div>
 
                     <div className="w-24 text-right">
-                      <span className={`text-sm font-black ${lineCost > 0 ? 'text-emerald-600' : 'text-slate-300'}`}>
+                      <span className={`text-sm font-black ${lineCost > 0 ? 'text-emerald-600' : 'text-slate-900'}`}>
                         {lineCost > 0 ? `€ ${lineCost.toFixed(3)}` : '—'}
                       </span>
                     </div>
@@ -384,14 +384,14 @@ export default function RecipeBuilder({ mode, existingData, onSave, isSaving }: 
           {recipeItems.some(r => r.item_id) && (
             <div className="mt-6 pt-4 border-t border-slate-100">
               <div className="flex justify-between items-center">
-                <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">
+                <span className="text-sm font-bold text-slate-900 uppercase tracking-wider">
                   {mode === 'dish' ? t('estimatedProductionCost') : `${t('estimatedTotalCost')} (${t('costPerUnit')} ${yieldQuantity || '?'} ${yieldUom})`}
                 </span>
                 <span className="text-2xl font-black text-slate-800">€ {liveCost.toFixed(3)}</span>
               </div>
               {mode === 'dish' && sellingPrice && (
                 <div className="flex justify-between items-center mt-2">
-                  <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">{t('estimatedMargin')}</span>
+                  <span className="text-sm font-bold text-slate-900 uppercase tracking-wider">{t('estimatedMargin')}</span>
                   <span className={`text-xl font-black ${Number(sellingPrice) - liveCost > 0 ? 'text-emerald-600' : 'text-red-500'}`}>
                     € {(Number(sellingPrice) - liveCost).toFixed(3)}
                   </span>
@@ -399,7 +399,7 @@ export default function RecipeBuilder({ mode, existingData, onSave, isSaving }: 
               )}
               {mode === 'preparation' && yieldQuantity && Number(yieldQuantity) > 0 && (
                 <div className="flex justify-between items-center mt-2">
-                  <span className="text-sm font-bold text-slate-500 uppercase tracking-wider">
+                  <span className="text-sm font-bold text-slate-900 uppercase tracking-wider">
                     {t('costPerUnit')} {yieldUom}
                   </span>
                   <span className="text-xl font-black text-indigo-600">
