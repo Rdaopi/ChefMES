@@ -277,8 +277,8 @@ export default function TradingTerminalPage() {
             }`}
           >
             {f === 'all'
-              ? `Tutti (${items.length})`
-              : `${f} (${items.filter(i => i.status === f).length})`
+              ? `t('all') (${items.length})`
+              : `${t(f)} (${items.filter(i => i.status === f).length})`
             }
           </button>
         ))}
