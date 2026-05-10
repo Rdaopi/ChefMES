@@ -38,7 +38,6 @@ interface TerminalItem {
 }
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-
 function Sparkline({ data, trendDirection }: { data: PricePoint[], trendDirection: string }) {
   if (data.length < 2) return (
     <span className="text-xs text-slate-300 italic">—</span>
@@ -61,6 +60,7 @@ function PriceHistoryChart({ data, contractPrice, uom }: {
   contractPrice: number;
   uom: string;
 }) {
+  const { t } = useTranslations();
   if (data.length < 2) return (
     <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 text-sm text-slate-400 italic">
       {t('insufficientPriceHistory')}
