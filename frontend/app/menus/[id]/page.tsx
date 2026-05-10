@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from 'react';
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -28,7 +29,7 @@ interface DishDetail {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
-export default function DishDetailPage() {
+function DishDetailContent() {
   const { id } = useParams();
   const router = useRouter();
   const [dish, setDish] = useState<DishDetail | null>(null);
@@ -237,5 +238,21 @@ export default function DishDetailPage() {
 
       </article>
     </main>
+  );
+}
+
+export default function DishDetailPage() {
+  return (
+    <Suspense fallback={
+      <main className="p-8 max-w-4xl mx-auto" aria-busy="true">
+        <div className="animate-pulse space-y-6">
+          <div className="h-6 w-32 bg-slate-200 rounded"></div>
+          <div className="h-40 bg-slate-100 rounded-2xl w-full"></div>
+          <div className="h-64 bg-slate-100 rounded-2xl w-full"></div>
+        </div>
+      </main>
+    }>
+      <DishDetailContent />
+    </Suspense>
   );
 }

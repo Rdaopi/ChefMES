@@ -1,4 +1,5 @@
 'use client';
+import { Suspense } from 'react';
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
@@ -7,7 +8,8 @@ import { getTranslation, DEFAULT_LOCALE } from '@/lib/i18n';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
-export default function DishBuilderPage() {
+// ← Move all the logic into this inner component
+function DishBuilderContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const editId = searchParams.get('id');
@@ -82,5 +84,18 @@ export default function DishBuilderPage() {
       onSave={handleSave}
       isSaving={isSaving}
     />
+  );
+}
+
+// ← Default export is now just a Suspense wrapper
+export default function DishBuilderPage() {
+  return (
+    <Suspense fallback={
+      <div className="p-8 text-center text-slate-400">
+        <i className="fas fa-spinner fa-spin mr-2"></i>
+      </div>
+    }>
+      <DishBuilderContent />
+    </Suspense>
   );
 }

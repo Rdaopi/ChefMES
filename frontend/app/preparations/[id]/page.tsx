@@ -1,5 +1,6 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -27,7 +28,9 @@ interface PreparationDetail {
   ingredients: PrepIngredient[];
 }
 
-export default function PreparationDetailPage() {
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
+function PreparationDetailContent() {
   const { id } = useParams();
   const router = useRouter();
   const [prep, setPrep] = useState<PreparationDetail | null>(null);
@@ -172,5 +175,21 @@ export default function PreparationDetailPage() {
 
       </article>
     </main>
+  );
+}
+
+export default function PreparationDetailPage() {
+  return (
+    <Suspense fallback={
+      <main className="p-8 max-w-4xl mx-auto" aria-busy="true">
+        <div className="animate-pulse space-y-6">
+          <div className="h-6 w-32 bg-slate-200 rounded"></div>
+          <div className="h-40 bg-slate-100 rounded-2xl w-full"></div>
+          <div className="h-64 bg-slate-100 rounded-2xl w-full"></div>
+        </div>
+      </main>
+    }>
+      <PreparationDetailContent />
+    </Suspense>
   );
 }

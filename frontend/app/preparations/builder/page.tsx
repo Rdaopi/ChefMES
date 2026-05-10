@@ -1,4 +1,5 @@
 'use client';
+import { Suspense } from 'react';
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
@@ -6,7 +7,7 @@ import RecipeBuilder from '@/components/RecipeBuilder';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
-export default function PreparationBuilderPage() {
+function PreparationBuilderContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const editId = searchParams.get('id');
@@ -70,5 +71,17 @@ export default function PreparationBuilderPage() {
       onSave={handleSave}
       isSaving={isSaving}
     />
+  );
+}
+
+export default function PreparationBuilderPage() {
+  return (
+    <Suspense fallback={
+      <div className="p-8 text-center text-slate-400">
+        <i className="fas fa-spinner fa-spin mr-2"></i>
+      </div>
+    }>
+      <PreparationBuilderContent />
+    </Suspense>
   );
 }
