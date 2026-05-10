@@ -5,6 +5,9 @@ import { authenticate } from '../middleware/auth.js';
 import { getInvoicesBySupplier, getSuppliers } from '../controllers/supplierController.js';
 import { getAvailableIngredients, getMenuById, getMenus, saveDishRecipe, deleteDish } from '../controllers/menuController.js';
 import { deletePreparation, getPreparationById, getPreparations, savePreparation } from '../controllers/preparationController.js';
+import { getTerminalData } from '../controllers/terminalController.js';
+import { getSettings, getSettings, updateSettings } from '../controllers/settingsController.js';
+import { getStats } from '../controllers/statsController.js';
 
 console.log('Setting up API routes...');
 
@@ -12,7 +15,6 @@ const router = Router();
 
 // --- MOCK ROUTES  ---
 router.get('/stats', (req, res) => res.json(globalStats));
-router.get('/terminal', (req, res) => res.json(terminalItems));
 router.get('/orders', (req, res) => res.json(ordersData));
 
 // -- REAL ROUTES ---
@@ -35,5 +37,11 @@ router.get('/preparations/:id', authenticate, getPreparationById);
 router.post('/preparations', authenticate, savePreparation);
 router.put('/preparations/:id', authenticate, savePreparation);
 router.delete('/preparations/:id', authenticate, deletePreparation);
+
+router.get('/terminal', authenticate, getTerminalData);
+
+router.get('/stats', authenticate, getStats);
+router.get('/settings', authenticate, getSettings);
+router.put('/settings', authenticate, updateSettings);
 
 export default router;
