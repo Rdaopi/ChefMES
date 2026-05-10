@@ -96,7 +96,7 @@ function PriceHistoryChart({ data, contractPrice, uom }: {
               const num = Number(value ?? 0);
               return [`€ ${num.toFixed(4)} / ${uom}`, 'Prezzo'];
             }}
-            labelFormatter={d => new Date(d).toLocaleDateString('it-IT', {
+            labelFormatter={(d) => new Date(d).toLocaleDateString('it-IT', {
               day: '2-digit', month: 'long', year: 'numeric'
             })}
             contentStyle={{
