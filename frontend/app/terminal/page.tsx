@@ -20,6 +20,17 @@ interface PricePoint {
   supplier: string;
 }
 
+interface SupplierStat {
+  supplierId: string;
+  supplierName: string;
+  latestPrice: number;
+  bestPrice: number;
+  avgPrice: number;
+  deliveries: number;
+  lastDate: string;
+  isCheapest: boolean;
+}
+
 interface TerminalItem {
   id: string;
   ingredient: string;
@@ -55,14 +66,14 @@ function Sparkline({ data, trendDirection }: { data: PricePoint[], trendDirectio
   );
 }
 
-function PriceHistoryChart({ data, contractPrice, uom }: {
+function PriceHistoryContent({ data, contractPrice, uom }: {
   data: PricePoint[];
   contractPrice: number;
   uom: string;
 }) {
   const { t } = useTranslations();
   if (data.length < 2) return (
-    <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 text-sm text-slate-400 italic">
+    <div className="px-6 py-4 text-sm text-slate-400 italic">
       {t('insufficientPriceHistory')}
     </div>
   );
@@ -72,7 +83,7 @@ function PriceHistoryChart({ data, contractPrice, uom }: {
   const padding = (maxPrice - minPrice) * 0.2 || 0.5;
 
   return (
-    <div className="px-6 py-5 bg-slate-50 border-t border-slate-100">
+    <div className="px-6 py-5">
       <p className="text-xs font-black text-slate-400 uppercase tracking-wider mb-3">
         {t('priceHistory')} ({data.length} {t('observations')})
       </p>
@@ -130,24 +141,155 @@ function PriceHistoryChart({ data, contractPrice, uom }: {
   );
 }
 
+function SupplierComparisonContent({ data, isLoading, uom }: {
+  data: SupplierStat[] | null;
+  isLoading: boolean;
+  uom: string;
+}) {
+  const { t } = useTranslations();
+
+  if (isLoading) return (
+    <div className="px-6 py-4 text-sm text-slate-400 italic">{t('loadingSupplierData')}</div>
+  );
+  if (!data?.length) return (
+    <div className="px-6 py-4 text-sm text-slate-400 italic">{t('noSupplierData')}</div>
+  );
+
+  return (
+    <div className="px-6 py-4">
+      <p className="text-xs font-black text-slate-400 uppercase tracking-wider mb-3">
+        {t('supplierComparison')} ({data.length} {t('suppliers')})
+      </p>
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="text-xs text-slate-400 uppercase tracking-wider border-b border-slate-200">
+            <th className="text-left pb-2 font-semibold pr-4">{t('supplier')}</th>
+            <th className="text-right pb-2 font-semibold pr-4">{t('livePrice')}</th>
+            <th className="text-right pb-2 font-semibold pr-4">{t('bestPrice')}</th>
+            <th className="text-right pb-2 font-semibold pr-4">{t('avgPrice')}</th>
+            <th className="text-right pb-2 font-semibold pr-4">{t('deliveries')}</th>
+            <th className="text-right pb-2 font-semibold">{t('date')}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.map(s => (
+            <tr
+              key={s.supplierId}
+              className={`border-b border-slate-100 last:border-0 ${s.isCheapest ? 'bg-emerald-50' : ''}`}
+            >
+              <td className="py-2 pr-4">
+                <span className="font-medium text-slate-700">{s.supplierName}</span>
+                {s.isCheapest && (
+                  <span className="ml-2 text-[10px] font-black px-1.5 py-0.5 bg-emerald-100 text-emerald-700 rounded uppercase tracking-wide">
+                    {t('bestLabel')}
+                  </span>
+                )}
+              </td>
+              <td className="py-2 pr-4 text-right font-mono text-slate-700">
+                € {s.latestPrice.toFixed(4)} <span className="text-slate-400 text-xs">/{uom}</span>
+              </td>
+              <td className="py-2 pr-4 text-right font-mono text-emerald-600">
+                € {s.bestPrice.toFixed(4)}
+              </td>
+              <td className="py-2 pr-4 text-right font-mono text-slate-500">
+                € {s.avgPrice.toFixed(4)}
+              </td>
+              <td className="py-2 pr-4 text-right text-slate-500">{s.deliveries}</td>
+              <td className="py-2 text-right text-slate-400 text-xs">
+                {new Date(s.lastDate).toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' })}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function ExpandedRowPanel({ row }: { row: TerminalItem }) {
+  const [activeTab, setActiveTab] = useState<'history' | 'suppliers'>('history');
+  const [supplierData, setSupplierData] = useState<SupplierStat[] | null>(null);
+  const [isLoadingSuppliers, setIsLoadingSuppliers] = useState(false);
+  const { t } = useTranslations();
+
+  const loadSuppliers = async () => {
+    if (supplierData !== null || isLoadingSuppliers) return;
+    setIsLoadingSuppliers(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch(`${API_URL}/api/terminal/${row.id}/suppliers`, {
+        headers: { 'Authorization': `Bearer ${session?.access_token}` }
+      });
+      if (!res.ok) throw new Error(`Server error: ${res.status}`);
+      setSupplierData(await res.json());
+    } catch (err) {
+      console.error('Supplier comparison fetch error:', err);
+      setSupplierData([]);
+    } finally {
+      setIsLoadingSuppliers(false);
+    }
+  };
+
+  const tabClass = (tab: 'history' | 'suppliers') =>
+    `px-4 py-2 text-xs font-bold transition-colors border-b-2 -mb-px ${
+      activeTab === tab
+        ? 'border-indigo-500 text-indigo-600'
+        : 'border-transparent text-slate-400 hover:text-slate-600'
+    }`;
+
+  return (
+    <div className="bg-slate-50 border-t border-slate-100">
+      <div className="flex px-6 border-b border-slate-200">
+        <button type="button" className={tabClass('history')} onClick={() => setActiveTab('history')}>
+          {t('priceHistory')}
+        </button>
+        <button
+          type="button"
+          className={tabClass('suppliers')}
+          onClick={() => { setActiveTab('suppliers'); loadSuppliers(); }}
+        >
+          {t('supplierComparison')}
+        </button>
+      </div>
+      {activeTab === 'history' ? (
+        <PriceHistoryContent
+          data={row.priceHistory || []}
+          contractPrice={row.contractPrice}
+          uom={row.uom}
+        />
+      ) : (
+        <SupplierComparisonContent
+          data={supplierData}
+          isLoading={isLoadingSuppliers}
+          uom={row.uom}
+        />
+      )}
+    </div>
+  );
+}
+
 export default function TradingTerminalPage() {
   const [items, setItems] = useState<TerminalItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'Warning' | 'Opportunity' | 'Stable'>('all');
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [daysFilter, setDaysFilter] = useState<0 | 30 | 60 | 90>(0);
   const { t } = useTranslations();
 
   useEffect(() => {
     const fetchTerminalData = async () => {
+      setIsLoading(true);
+      setExpandedId(null);
       try {
         const { data: { session } } = await supabase.auth.getSession();
-        const res = await fetch(`${API_URL}/api/terminal`, {
+        const url = daysFilter > 0
+          ? `${API_URL}/api/terminal?days=${daysFilter}`
+          : `${API_URL}/api/terminal`;
+        const res = await fetch(url, {
           headers: { 'Authorization': `Bearer ${session?.access_token}` }
         });
         if (!res.ok) throw new Error(`Server error: ${res.status}`);
-        const data = await res.json();
-        console.log('Terminal sample:', data[0]);
-        setItems(data);
+        setItems(await res.json());
       } catch (err) {
         console.error('Terminal fetch error:', err);
       } finally {
@@ -155,7 +297,7 @@ export default function TradingTerminalPage() {
       }
     };
     fetchTerminalData();
-  }, []);
+  }, [daysFilter]);
 
   const filtered = filter === 'all' ? items : items.filter(i => i.status === filter);
 
@@ -264,24 +406,43 @@ export default function TradingTerminalPage() {
       <TerminalStats />
 
       {/* FILTER TABS */}
-      <div className="flex gap-2 mb-4">
-        {(['all', 'Warning', 'Opportunity', 'Stable'] as const).map(f => (
-          <button
-            key={f}
-            type="button"
-            onClick={() => setFilter(f)}
-            className={`px-4 py-2 rounded-lg text-xs font-bold transition-colors ${
-              filter === f
-                ? 'bg-indigo-600 text-white'
-                : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
-            }`}
-          >
-            {f === 'all'
-              ? `${t('all')} (${items.length})`
-              : `${t(f)} (${items.filter(i => i.status === f).length})`
-            }
-          </button>
-        ))}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex gap-2">
+          {(['all', 'Warning', 'Opportunity', 'Stable'] as const).map(f => (
+            <button
+              key={f}
+              type="button"
+              onClick={() => setFilter(f)}
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition-colors ${
+                filter === f
+                  ? 'bg-indigo-600 text-white'
+                  : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+              }`}
+            >
+              {f === 'all'
+                ? `${t('all')} (${items.length})`
+                : `${t(f)} (${items.filter(i => i.status === f).length})`
+              }
+            </button>
+          ))}
+        </div>
+        <div className="flex items-center gap-1">
+          <span className="text-xs text-slate-400 font-semibold mr-1">{t('period')}:</span>
+          {([30, 60, 90, 0] as const).map(d => (
+            <button
+              key={d}
+              type="button"
+              onClick={() => setDaysFilter(d)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+                daysFilter === d
+                  ? 'bg-slate-700 text-white'
+                  : 'bg-white border border-slate-200 text-slate-500 hover:bg-slate-50'
+              }`}
+            >
+              {d === 0 ? t('all') : `${d}d`}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* TABLE */}
@@ -294,13 +455,7 @@ export default function TradingTerminalPage() {
         keyExtractor={row => row.id}
         onRowClick={row => setExpandedId(prev => prev === row.id ? null : row.id)}
         expandedId={expandedId}
-        renderExpanded={row => (
-          <PriceHistoryChart
-            data={row.priceHistory || []}
-            contractPrice={row.contractPrice}
-            uom={row.uom}
-          />
-        )}
+        renderExpanded={row => <ExpandedRowPanel row={row} />}
       />
 
     </div>

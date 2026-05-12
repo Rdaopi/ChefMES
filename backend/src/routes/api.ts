@@ -5,8 +5,8 @@ import { authenticate } from '../middleware/auth.js';
 import { getInvoicesBySupplier, getSuppliers } from '../controllers/supplierController.js';
 import { getAvailableIngredients, getMenuById, getMenus, saveDishRecipe, deleteDish } from '../controllers/menuController.js';
 import { deletePreparation, getPreparationById, getPreparations, savePreparation } from '../controllers/preparationController.js';
-import { getTerminalData } from '../controllers/terminalController.js';
-import { getSettings, getSettings, updateSettings } from '../controllers/settingsController.js';
+import { getTerminalData, getIngredientSuppliers } from '../controllers/terminalController.js';
+import { getSettings, updateSettings } from '../controllers/settingsController.js';
 import { getStats } from '../controllers/statsController.js';
 
 console.log('Setting up API routes...');
@@ -39,6 +39,7 @@ router.put('/preparations/:id', authenticate, savePreparation);
 router.delete('/preparations/:id', authenticate, deletePreparation);
 
 router.get('/terminal', authenticate, getTerminalData);
+router.get('/terminal/:ingredientId/suppliers', authenticate, getIngredientSuppliers);
 
 router.get('/stats', authenticate, getStats);
 router.get('/settings', authenticate, getSettings);

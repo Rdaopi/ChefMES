@@ -243,6 +243,18 @@ const translations: Record<Locale, Record<string, string>> = {
     maxLabel: 'max:',
     dishesCostRisk: 'At-Risk Dishes',
     dishes: 'dishes',
+
+    // Supplier comparison
+    supplierComparison: 'Supplier Comparison',
+    bestPrice: 'Best Price',
+    avgPrice: 'Avg. Price',
+    deliveries: 'Deliveries',
+    bestLabel: 'BEST',
+    observations: 'observations',
+    insufficientPriceHistory: 'Insufficient price history — load more invoices to see the trend.',
+    loadingSupplierData: 'Loading supplier data...',
+    noSupplierData: 'No supplier data available.',
+    period: 'Period',
   },
   it: {
     appName: 'ChefMES',
@@ -477,6 +489,18 @@ const translations: Record<Locale, Record<string, string>> = {
     maxLabel: 'max:',
     dishesCostRisk: 'Piatti a Rischio',
     dishes: 'piatti',
+
+    // Supplier comparison
+    supplierComparison: 'Confronto Fornitori',
+    bestPrice: 'Miglior Prezzo',
+    avgPrice: 'Prezzo Medio',
+    deliveries: 'Consegne',
+    bestLabel: 'BEST',
+    observations: 'rilevazioni',
+    insufficientPriceHistory: 'Storico prezzi insufficiente — carica più fatture per vedere il trend.',
+    loadingSupplierData: 'Caricamento dati fornitori...',
+    noSupplierData: 'Nessun dato fornitore disponibile.',
+    period: 'Periodo',
   },
   fr: {
     appName: 'ChefMES',
@@ -702,6 +726,18 @@ const translations: Record<Locale, Record<string, string>> = {
     editDishButton: 'Modifier la Recette',
     productionCost: 'Coût de Production',
     totalIngredientsLabel: 'Coût Total des Ingrédients',
+
+    // Supplier comparison
+    supplierComparison: 'Comparaison Fournisseurs',
+    bestPrice: 'Meilleur Prix',
+    avgPrice: 'Prix Moyen',
+    deliveries: 'Livraisons',
+    bestLabel: 'BEST',
+    observations: 'observations',
+    insufficientPriceHistory: 'Historique insuffisant — chargez plus de factures pour voir la tendance.',
+    loadingSupplierData: 'Chargement des données fournisseurs...',
+    noSupplierData: 'Aucune donnée fournisseur disponible.',
+    period: 'Période',
   },
   de: {
     appName: 'ChefMES',
@@ -927,6 +963,18 @@ const translations: Record<Locale, Record<string, string>> = {
     editDishButton: 'Rezept bearbeiten',
     productionCost: 'Produktionskosten',
     totalIngredientsLabel: 'Gesamtkosten der Zutaten',
+
+    // Supplier comparison
+    supplierComparison: 'Lieferantenvergleich',
+    bestPrice: 'Bester Preis',
+    avgPrice: 'Durchschn. Preis',
+    deliveries: 'Lieferungen',
+    bestLabel: 'BEST',
+    observations: 'Beobachtungen',
+    insufficientPriceHistory: 'Unzureichende Historie — laden Sie mehr Rechnungen, um den Trend zu sehen.',
+    loadingSupplierData: 'Lieferantendaten werden geladen...',
+    noSupplierData: 'Keine Lieferantendaten verfügbar.',
+    period: 'Zeitraum',
   },
 };
 
