@@ -1,10 +1,34 @@
 'use client';
 
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabase';
 import { LanguageSwitcher, useTranslations } from '@/components/LanguageProvider';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 export default function Sidebar() {
   const { t } = useTranslations();
+  const [alertCount, setAlertCount] = useState(0);
+
+  useEffect(() => {
+    const fetchAlertCount = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return;
+        const res = await fetch(`${API_URL}/api/alerts`, {
+          headers: { 'Authorization': `Bearer ${session.access_token}` }
+        });
+        if (res.ok) {
+          const alerts = await res.json();
+          setAlertCount(Array.isArray(alerts) ? alerts.length : 0);
+        }
+      } catch {
+        // silently ignore — badge is non-critical
+      }
+    };
+    fetchAlertCount();
+  }, []);
 
   return (
     <aside className="w-64 bg-slate-900 text-slate-300 flex flex-col transition-all shrink-0 h-screen">
@@ -16,6 +40,11 @@ export default function Sidebar() {
             <Link href="/terminal" className="flex items-center px-4 py-3 hover:bg-slate-800 hover:text-white rounded-xl transition-colors">
                 <i className="fas fa-chart-line w-6"></i>
                 <span className="font-medium">{t('tradingTerminal')}</span>
+                {alertCount > 0 && (
+                  <span className="ml-auto bg-red-500 text-white text-xs font-black px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
+                    {alertCount}
+                  </span>
+                )}
             </Link>
             <Link href="/orders" className="flex items-center px-4 py-3 hover:bg-slate-800 hover:text-white rounded-xl transition-colors">
                 <i className="fas fa-shopping-basket w-6"></i>
