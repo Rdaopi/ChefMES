@@ -384,14 +384,7 @@ export const deleteInvoice = async (req: any, res: Response) => {
   const { id } = req.params;
 
   try {
-    const { error: lineErr } = await supabase
-      .from('invoice_lines')
-      .delete()
-      .eq('invoice_id', id)
-      .eq('user_id', userId);
-
-    if (lineErr) throw lineErr;
-
+    
     const { error: invoiceErr } = await supabase
       .from('invoices_mvp')
       .delete()
@@ -400,7 +393,13 @@ export const deleteInvoice = async (req: any, res: Response) => {
 
     if (invoiceErr) throw invoiceErr;
 
-    console.warn(`Invoice ${id} deleted. Prices may be stale for affected ingredients.`);
+    const { error: lineErr } = await supabase
+      .from('invoice_lines')
+      .delete()
+      .eq('invoice_id', id)
+      .eq('user_id', userId);
+
+    if (lineErr) throw lineErr;
 
     res.json({ success: true, message: 'Invoice deleted successfully!' });
   } catch (error) {

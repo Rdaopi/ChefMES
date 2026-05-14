@@ -8,6 +8,7 @@ import { deletePreparation, getPreparationById, getPreparations, savePreparation
 import { getTerminalData, getIngredientSuppliers } from '../controllers/terminalController.js';
 import { getSettings, updateSettings } from '../controllers/settingsController.js';
 import { getStats } from '../controllers/statsController.js';
+import { getAlerts, applyPrice, dismissAlert } from '../controllers/alertsController.js';
 
 console.log('Setting up API routes...');
 
@@ -44,5 +45,9 @@ router.get('/terminal/:ingredientId/suppliers', authenticate, getIngredientSuppl
 router.get('/stats', authenticate, getStats);
 router.get('/settings', authenticate, getSettings);
 router.put('/settings', authenticate, updateSettings);
+
+router.get('/alerts', authenticate, getAlerts);
+router.put('/alerts/apply-price', authenticate, applyPrice);
+router.post('/alerts/dismiss', authenticate, dismissAlert);
 
 export default router;

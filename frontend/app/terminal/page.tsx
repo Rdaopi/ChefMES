@@ -4,6 +4,7 @@ import { useTranslations } from '@/components/LanguageProvider';
 import { supabase } from '@/lib/supabase';
 import TerminalStats from '@/components/TerminalStats';
 import DataTable from '@/components/DataTable';
+import ActionCenter from '@/components/ActionCenter';
 import {
   ResponsiveContainer,
   LineChart,
@@ -276,27 +277,29 @@ export default function TradingTerminalPage() {
   const [daysFilter, setDaysFilter] = useState<0 | 30 | 60 | 90>(0);
   const { t } = useTranslations();
 
+  const fetchTerminalData = async () => {
+    setIsLoading(true);
+    setExpandedId(null);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const url = daysFilter > 0
+        ? `${API_URL}/api/terminal?days=${daysFilter}`
+        : `${API_URL}/api/terminal`;
+      const res = await fetch(url, {
+        headers: { 'Authorization': `Bearer ${session?.access_token}` }
+      });
+      if (!res.ok) throw new Error(`Server error: ${res.status}`);
+      setItems(await res.json());
+    } catch (err) {
+      console.error('Terminal fetch error:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchTerminalData = async () => {
-      setIsLoading(true);
-      setExpandedId(null);
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        const url = daysFilter > 0
-          ? `${API_URL}/api/terminal?days=${daysFilter}`
-          : `${API_URL}/api/terminal`;
-        const res = await fetch(url, {
-          headers: { 'Authorization': `Bearer ${session?.access_token}` }
-        });
-        if (!res.ok) throw new Error(`Server error: ${res.status}`);
-        setItems(await res.json());
-      } catch (err) {
-        console.error('Terminal fetch error:', err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
     fetchTerminalData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [daysFilter]);
 
   const filtered = filter === 'all' ? items : items.filter(i => i.status === filter);
@@ -404,6 +407,9 @@ export default function TradingTerminalPage() {
 
       {/* STATS STRIP */}
       <TerminalStats />
+
+      {/* ACTION CENTER */}
+      <ActionCenter onPriceApplied={fetchTerminalData} />
 
       {/* FILTER TABS */}
       <div className="flex items-center justify-between mb-4">
