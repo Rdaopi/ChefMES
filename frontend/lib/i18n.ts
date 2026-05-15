@@ -255,6 +255,40 @@ const translations: Record<Locale, Record<string, string>> = {
     loadingSupplierData: 'Loading supplier data...',
     noSupplierData: 'No supplier data available.',
     period: 'Period',
+
+    // Terminal columns
+    livePrice: 'Live Price',
+    recentTrend: 'Recent Trend',
+    price: 'Price',
+
+    // Terminal status filters
+    statusWarning: 'Warning',
+    statusOpportunity: 'Opportunity',
+    statusStable: 'Stable',
+
+    // Action Center
+    checkingAlerts: 'Checking for alerts…',
+    actionCenter: 'Action Center',
+    alertsCount: 'alerts',
+    alertCount: 'alert',
+    criticalSuffix: 'critical',
+    allMetricsOk: 'All metrics within target — no action required.',
+    acMarginLabel: 'Margin:',
+    acTargetLabel: 'target:',
+    acProductionCost: 'Production cost:',
+    acCurrentPrice: 'Current price:',
+    acFoodCostLabel: 'Food Cost:',
+    acTargetMaxLabel: 'target max:',
+    acMainDriver: 'Main driver:',
+    acSuggestedPrice: 'Suggested price:',
+    acRoundedNote: '(rounded to nearest €0.50)',
+    acPriceUp: 'Price up',
+    acSinceFirstInvoice: 'since first invoice',
+    acAffects: 'Affects:',
+    acApplyPrice: 'Apply',
+    acViewDish: 'View Dish',
+    acReviewDishes: 'Review Dishes',
+    acApplying: 'Applying…',
   },
   it: {
     appName: 'ChefMES',
@@ -501,6 +535,41 @@ const translations: Record<Locale, Record<string, string>> = {
     loadingSupplierData: 'Caricamento dati fornitori...',
     noSupplierData: 'Nessun dato fornitore disponibile.',
     period: 'Periodo',
+
+    // Terminal columns
+    livePrice: 'Prezzo Live',
+    recentTrend: 'Trend Recente',
+    price: 'Prezzo',
+
+    // Terminal status filters
+    statusWarning: 'Allerta',
+    statusOpportunity: 'Opportunità',
+    statusStable: 'Stabile',
+
+    // Action Center
+    checkingAlerts: 'Verifica avvisi in corso…',
+    actionCenter: 'Centro Azioni',
+    alertsCount: 'avvisi',
+    alertCount: 'avviso',
+    criticalSuffix: 'critici',
+    allMetricsOk: 'Tutti i parametri nei target — nessuna azione richiesta.',
+    acMarginLabel: 'Margine:',
+    acTargetLabel: 'obiettivo:',
+    acProductionCost: 'Costo produzione:',
+    acCurrentPrice: 'Prezzo attuale:',
+    acFoodCostLabel: 'Food Cost:',
+    acTargetMaxLabel: 'max:',
+    acMainDriver: 'Driver principale:',
+    acSuggestedPrice: 'Prezzo suggerito:',
+    acRoundedNote: '(arrotondato a €0,50)',
+    acPriceUp: 'Prezzo +',
+    acSinceFirstInvoice: 'dalla prima fattura',
+    acAffects: 'Impatta:',
+    acApplyPrice: 'Applica',
+    acViewDish: 'Vedi Piatto',
+    acReviewDishes: 'Rivedi Piatti',
+    acApplying: 'Applicazione…',
+
   },
   fr: {
     appName: 'ChefMES',
@@ -738,6 +807,49 @@ const translations: Record<Locale, Record<string, string>> = {
     loadingSupplierData: 'Chargement des données fournisseurs...',
     noSupplierData: 'Aucune donnée fournisseur disponible.',
     period: 'Période',
+
+    // Terminal Stats
+    monthlySpendLabel: 'Dépenses Mensuelles',
+    editBudget: 'Modifier le budget',
+    currentMargin: 'Marge Actuelle',
+    targetLabel: 'cible :',
+    maxLabel: 'max :',
+    dishesCostRisk: 'Plats à Risque',
+    dishes: 'plats',
+
+    // Terminal columns
+    livePrice: 'Prix en Direct',
+    recentTrend: 'Tendance Récente',
+    price: 'Prix',
+
+    // Terminal status filters
+    statusWarning: 'Alerte',
+    statusOpportunity: 'Opportunité',
+    statusStable: 'Stable',
+
+    // Action Center
+    checkingAlerts: 'Vérification des alertes…',
+    actionCenter: 'Centre d\'Actions',
+    alertsCount: 'alertes',
+    alertCount: 'alerte',
+    criticalSuffix: 'critiques',
+    allMetricsOk: 'Tous les paramètres dans les cibles — aucune action requise.',
+    acMarginLabel: 'Marge :',
+    acTargetLabel: 'cible :',
+    acProductionCost: 'Coût de production :',
+    acCurrentPrice: 'Prix actuel :',
+    acFoodCostLabel: 'Coût alimentaire :',
+    acTargetMaxLabel: 'max :',
+    acMainDriver: 'Facteur principal :',
+    acSuggestedPrice: 'Prix suggéré :',
+    acRoundedNote: '(arrondi au €0,50 supérieur)',
+    acPriceUp: 'Prix +',
+    acSinceFirstInvoice: 'depuis la première facture',
+    acAffects: 'Affecte :',
+    acApplyPrice: 'Appliquer',
+    acViewDish: 'Voir Plat',
+    acReviewDishes: 'Revoir Plats',
+    acApplying: 'Application…',
   },
   de: {
     appName: 'ChefMES',
@@ -975,6 +1087,49 @@ const translations: Record<Locale, Record<string, string>> = {
     loadingSupplierData: 'Lieferantendaten werden geladen...',
     noSupplierData: 'Keine Lieferantendaten verfügbar.',
     period: 'Zeitraum',
+
+    // Terminal Stats
+    monthlySpendLabel: 'Monatliche Ausgaben',
+    editBudget: 'Budget bearbeiten',
+    currentMargin: 'Aktuelle Marge',
+    targetLabel: 'Ziel:',
+    maxLabel: 'max:',
+    dishesCostRisk: 'Gefährdete Gerichte',
+    dishes: 'Gerichte',
+
+    // Terminal columns
+    livePrice: 'Live-Preis',
+    recentTrend: 'Aktueller Trend',
+    price: 'Preis',
+
+    // Terminal status filters
+    statusWarning: 'Warnung',
+    statusOpportunity: 'Chance',
+    statusStable: 'Stabil',
+
+    // Action Center
+    checkingAlerts: 'Warnungen werden geprüft…',
+    actionCenter: 'Aktionszentrum',
+    alertsCount: 'Warnungen',
+    alertCount: 'Warnung',
+    criticalSuffix: 'kritisch',
+    allMetricsOk: 'Alle Kennzahlen im Zielbereich — kein Handlungsbedarf.',
+    acMarginLabel: 'Marge:',
+    acTargetLabel: 'Ziel:',
+    acProductionCost: 'Produktionskosten:',
+    acCurrentPrice: 'Aktueller Preis:',
+    acFoodCostLabel: 'Lebensmittelkosten:',
+    acTargetMaxLabel: 'max:',
+    acMainDriver: 'Haupttreiber:',
+    acSuggestedPrice: 'Empfohlener Preis:',
+    acRoundedNote: '(aufgerundet auf €0,50)',
+    acPriceUp: 'Preis +',
+    acSinceFirstInvoice: 'seit erster Rechnung',
+    acAffects: 'Betrifft:',
+    acApplyPrice: 'Anwenden',
+    acViewDish: 'Gericht ansehen',
+    acReviewDishes: 'Gerichte prüfen',
+    acApplying: 'Wird angewendet…',
   },
 };
 

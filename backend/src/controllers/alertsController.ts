@@ -76,6 +76,17 @@ export const getAlerts = async (req: any, res: Response) => {
 
       const productionCost = computeProductionCost(dishRecipes);
       const sellingPrice = Number(dish.selling_price) || 0;
+      console.log('Dish debug:', {
+        dish: dish.name,
+        sellingPrice,
+        productionCost,
+        recipes: dishRecipes.map((r: any) => ({
+          qty: r.quantity_needed,
+          ingr: r.standard_ingredients?.name,
+          price: r.standard_ingredients?.current_price,
+          prep: r.preparations ? 'yes' : 'no'
+        }))
+      });
       if (sellingPrice <= 0 || productionCost <= 0) continue;
 
       const marginPct = ((sellingPrice - productionCost) / sellingPrice) * 100;
@@ -191,6 +202,14 @@ export const getAlerts = async (req: any, res: Response) => {
     alerts.sort((a, b) => {
       if (a.severity === b.severity) return 0;
       return a.severity === 'critical' ? -1 : 1;
+    });
+
+    console.log('Alerts debug:', {
+      dishCount: dishes?.length,
+      recipeCount: recipes?.length,
+      settings: { targetMargin, targetFoodCost },
+      alertsGenerated: alerts.length,
+      alerts: alerts.map(a => ({ id: a.id, type: a.type, dish: a.dishName, metric: a.currentMetric }))
     });
 
     res.json(alerts);

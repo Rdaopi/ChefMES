@@ -5,6 +5,17 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+function normalizeSupplierName(name: string): string {
+  return name
+    .replace(/\b(S\.?P\.?A\.?|S\.?R\.?L\.?S?\.?|S\.?N\.?C\.?|S\.?A\.?S\.?|SPA|SRL|SNC|SAS|SRLS|LTD|GMBH)\b\.?/gi, '')
+    .replace(/[.\s]+$/, '')
+    .replace(/^[.\s]+/, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase()
+    .replace(/\b\w/g, (c: string) => c.toUpperCase());
+}
+
 export const uploadInvoice = async (req: any, res: Response) => {
   const { invoiceNumber, supplier: rawSupplier, lines, fileName, totalAmount, invoiceDate } = req.body;
   const userId = req.user.id;
@@ -33,7 +44,7 @@ export const uploadInvoice = async (req: any, res: Response) => {
 
     // 3. AI normalization — must happen before supplier resolution
     const aiResult = await normalizeInvoiceLinesWithAI(lines, rawSupplier);
-    const cleanSupplier = aiResult.cleanSupplier;
+    const cleanSupplier = normalizeSupplierName(aiResult.cleanSupplier);
     const mappedItems = aiResult.items;
 
     if (mappedItems.length !== lines.length) {
@@ -46,7 +57,7 @@ export const uploadInvoice = async (req: any, res: Response) => {
     const { data: existingSupplier } = await supabase
       .from('suppliers')
       .select('id')
-      .eq('name', cleanSupplier)
+      .ilike('name', cleanSupplier)
       .eq('user_id', userId)
       .single();
 
@@ -235,6 +246,17 @@ export const uploadInvoice = async (req: any, res: Response) => {
         last_updated: invoiceDate
       }));
 
+    if (priceUpdates.length > 0) {
+      for (const update of priceUpdates) {
+        const { error: priceErr } = await supabase
+          .from('standard_ingredients')
+          .update({ current_price: update.current_price, last_updated: update.last_updated })
+          .eq('id', update.id)
+          .eq('user_id', userId)
+          .lte('last_updated', invoiceDate);
+        if (priceErr) console.error('Price update error for', update.id, priceErr);
+      }
+    }
 
     // 10. Insert invoice lines
     const invoiceLinesToInsert = resolvedLines.map(r => ({

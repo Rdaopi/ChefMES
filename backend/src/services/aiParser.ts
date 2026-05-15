@@ -118,7 +118,19 @@ Your goal is to transform raw invoice descriptions into clean, structured data f
 
 === TASK 1: CLEAN SUPPLIER NAME ===
 - Input: "${supplier}"
-- Action: Remove legal suffixes (S.R.L., S.P.A., SNC, etc.), trim punctuation, use Title Case.
+- Rules (apply in order):
+  1. Remove ALL legal suffixes with or without dots:
+     S.P.A. / SPA / S.R.L. / SRL / S.R.L.S. / SRLS / S.N.C. / SNC / S.A.S. / SAS / LTD / GMBH
+  2. Remove trailing punctuation and spaces left after suffix removal
+  3. Convert to Title Case
+  4. Keep abbreviations that are part of the brand name (M.B.M. → Mbm)
+- Examples:
+  "MARR SPA"                    → "Marr"
+  "MARR S.P.A."                 → "Marr"
+  "CANTINE LIDO M.B.M. S.R.L." → "Cantine Lido Mbm"
+  "SEEMAR S.R.L."               → "Seemar"
+  "LA FRUTTICOLA SRL"           → "La Frutticola"
+  "ROSSI DISTRIBUZIONE S.N.C."  → "Rossi Distribuzione"
 
 === TASK 2: NORMALIZE EACH LINE ===
 

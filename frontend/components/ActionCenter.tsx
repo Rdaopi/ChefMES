@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import { useTranslations } from '@/components/LanguageProvider';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -46,15 +47,12 @@ function AlertCard({
   applying: boolean;
   dismissing: boolean;
 }) {
+  const { t } = useTranslations();
   const isCritical = alert.severity === 'critical';
 
   const borderClass = isCritical
     ? 'border-red-400 bg-red-50'
     : 'border-amber-400 bg-amber-50';
-
-  const badgeClass = isCritical
-    ? 'bg-red-100 text-red-700 border-red-300'
-    : 'bg-amber-100 text-amber-700 border-amber-300';
 
   const icon = isCritical ? 'fa-circle-exclamation' : 'fa-triangle-exclamation';
 
@@ -64,54 +62,48 @@ function AlertCard({
         <div className="flex items-start gap-3 flex-1 min-w-0">
           <i className={`fas ${icon} mt-0.5 shrink-0 ${isCritical ? 'text-red-500' : 'text-amber-500'}`}></i>
           <div className="flex-1 min-w-0">
-            {/* Title */}
             <p className="font-bold text-slate-800 text-sm">
-              {alert.type === 'price_spike'
-                ? alert.affectedIngredient
-                : alert.dishName}
+              {alert.type === 'price_spike' ? alert.affectedIngredient : alert.dishName}
             </p>
 
-            {/* Metric line */}
             {alert.type === 'margin' && (
               <p className="text-xs text-slate-600 mt-0.5">
-                Margin: <span className="font-bold text-red-600">{alert.currentMetric}%</span>
-                {' '}— target: <span className="font-semibold">{alert.targetMetric}%</span>
-                {' '}| Production cost: <span className="font-mono">€{alert.productionCost?.toFixed(2)}</span>
-                {' '}| Current price: <span className="font-mono">€{alert.sellingPrice?.toFixed(2)}</span>
+                {t('acMarginLabel')} <span className="font-bold text-red-600">{alert.currentMetric}%</span>
+                {' '}— {t('acTargetLabel')} <span className="font-semibold">{alert.targetMetric}%</span>
+                {' '}| {t('acProductionCost')} <span className="font-mono">€{alert.productionCost?.toFixed(2)}</span>
+                {' '}| {t('acCurrentPrice')} <span className="font-mono">€{alert.sellingPrice?.toFixed(2)}</span>
               </p>
             )}
 
             {alert.type === 'foodcost' && (
               <p className="text-xs text-slate-600 mt-0.5">
-                Food Cost: <span className="font-bold text-amber-700">{alert.currentMetric}%</span>
-                {' '}— target max: <span className="font-semibold">{alert.targetMetric}%</span>
+                {t('acFoodCostLabel')} <span className="font-bold text-amber-700">{alert.currentMetric}%</span>
+                {' '}— {t('acTargetMaxLabel')} <span className="font-semibold">{alert.targetMetric}%</span>
                 {alert.mainCostDriver && (
-                  <> | Main driver: <span className="font-semibold">{alert.mainCostDriver}</span></>
+                  <> | {t('acMainDriver')} <span className="font-semibold">{alert.mainCostDriver}</span></>
                 )}
               </p>
             )}
 
             {alert.type === 'price_spike' && (
               <p className="text-xs text-slate-600 mt-0.5">
-                Price up <span className="font-bold text-amber-700">+{alert.priceChangePercent}%</span>
-                {' '}since first invoice
+                {t('acPriceUp')} <span className="font-bold text-amber-700">+{alert.priceChangePercent}%</span>
+                {' '}{t('acSinceFirstInvoice')}
                 {alert.affectedDishes && alert.affectedDishes.length > 0 && (
-                  <> | Affects: <span className="font-semibold">{alert.affectedDishes.join(', ')}</span></>
+                  <> | {t('acAffects')} <span className="font-semibold">{alert.affectedDishes.join(', ')}</span></>
                 )}
               </p>
             )}
 
-            {/* Suggested price */}
             {alert.suggestedPrice != null && (
               <p className="text-xs text-slate-500 mt-1">
-                Suggested price: <span className="font-mono font-bold text-indigo-600">€{alert.suggestedPrice.toFixed(2)}</span>
-                <span className="text-slate-400 ml-1">(rounded to nearest €0.50)</span>
+                {t('acSuggestedPrice')} <span className="font-mono font-bold text-indigo-600">€{alert.suggestedPrice.toFixed(2)}</span>
+                <span className="text-slate-400 ml-1">{t('acRoundedNote')}</span>
               </p>
             )}
           </div>
         </div>
 
-        {/* Actions */}
         <div className="flex items-center gap-2 shrink-0">
           {alert.suggestedPrice != null && alert.dishId && (
             <button
@@ -121,20 +113,20 @@ function AlertCard({
               className="px-3 py-1.5 text-xs font-bold bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors whitespace-nowrap"
             >
               {applying ? (
-                <><i className="fas fa-spinner fa-spin mr-1"></i>Applying…</>
+                <><i className="fas fa-spinner fa-spin mr-1"></i>{t('acApplying')}</>
               ) : (
-                <>Apply €{alert.suggestedPrice.toFixed(2)}</>
+                <>{t('acApplyPrice')} €{alert.suggestedPrice.toFixed(2)}</>
               )}
             </button>
           )}
 
-          {alert.dishId && (
+          {alert.dishId && alert.type !== 'price_spike' && (
             <button
               type="button"
               onClick={() => onViewDish(alert.dishId!)}
               className="px-3 py-1.5 text-xs font-bold bg-white border border-slate-300 text-slate-600 rounded-lg hover:bg-slate-50 transition-colors whitespace-nowrap"
             >
-              View Dish
+              {t('acViewDish')}
             </button>
           )}
 
@@ -144,7 +136,7 @@ function AlertCard({
               onClick={() => onViewDish(alert.dishId || '')}
               className="px-3 py-1.5 text-xs font-bold bg-white border border-slate-300 text-slate-600 rounded-lg hover:bg-slate-50 transition-colors whitespace-nowrap"
             >
-              Review Dishes
+              {t('acReviewDishes')}
             </button>
           )}
 
@@ -165,6 +157,7 @@ function AlertCard({
 
 export default function ActionCenter({ onPriceApplied }: ActionCenterProps) {
   const router = useRouter();
+  const { t } = useTranslations();
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
@@ -238,14 +231,13 @@ export default function ActionCenter({ onPriceApplied }: ActionCenterProps) {
   if (isLoading) {
     return (
       <div className="mb-6 bg-white border border-slate-200 rounded-xl p-4 text-sm text-slate-400 italic">
-        <i className="fas fa-spinner fa-spin mr-2"></i>Checking for alerts…
+        <i className="fas fa-spinner fa-spin mr-2"></i>{t('checkingAlerts')}
       </div>
     );
   }
 
   return (
     <div className="mb-6">
-      {/* Header / toggle */}
       <button
         type="button"
         onClick={() => setIsOpen(o => !o)}
@@ -266,15 +258,15 @@ export default function ActionCenter({ onPriceApplied }: ActionCenterProps) {
             <i className="fas fa-triangle-exclamation"></i>
           )}
           <span>
-            Action Center
+            {t('actionCenter')}
             {totalCount > 0 && (
               <span className={`ml-2 px-2 py-0.5 rounded-full text-xs border ${
                 criticalCount > 0
                   ? 'bg-red-100 text-red-700 border-red-300'
                   : 'bg-amber-100 text-amber-700 border-amber-300'
               }`}>
-                {totalCount} alert{totalCount !== 1 ? 's' : ''}
-                {criticalCount > 0 && ` — ${criticalCount} critical`}
+                {totalCount} {totalCount !== 1 ? t('alertsCount') : t('alertCount')}
+                {criticalCount > 0 && ` — ${criticalCount} ${t('criticalSuffix')}`}
               </span>
             )}
           </span>
@@ -282,13 +274,12 @@ export default function ActionCenter({ onPriceApplied }: ActionCenterProps) {
         <i className={`fas fa-chevron-${isOpen ? 'up' : 'down'} text-xs opacity-60`}></i>
       </button>
 
-      {/* Expanded panel */}
       {isOpen && (
         <div className="mt-2 bg-white border border-slate-200 rounded-xl overflow-hidden">
           {totalCount === 0 ? (
             <div className="px-5 py-6 flex items-center gap-3 text-emerald-600">
               <i className="fas fa-circle-check text-lg"></i>
-              <span className="text-sm font-semibold">All metrics within target — no action required.</span>
+              <span className="text-sm font-semibold">{t('allMetricsOk')}</span>
             </div>
           ) : (
             <div className="p-4 flex flex-col gap-3">

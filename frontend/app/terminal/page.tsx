@@ -375,17 +375,24 @@ export default function TradingTerminalPage() {
     {
       key: 'status',
       header: t('status'),
-      render: (row: TerminalItem) => (
-        <span className={`text-xs font-bold px-3 py-1.5 rounded-full border ${
-          row.status === 'Opportunity' ? 'bg-emerald-100 text-emerald-800 border-emerald-300' :
-          row.status === 'Warning' ? 'bg-red-100 text-red-800 border-red-300' :
-          'bg-slate-100 text-slate-600 border-slate-300'
-        }`}>
-          {row.status === 'Warning' && <i className="fas fa-exclamation-triangle mr-1"></i>}
-          {row.status === 'Opportunity' && <i className="fas fa-arrow-down mr-1"></i>}
-          {row.status}
-        </span>
-      )
+      render: (row: TerminalItem) => {
+        const statusKey: Record<string, string> = {
+          Warning: 'statusWarning',
+          Opportunity: 'statusOpportunity',
+          Stable: 'statusStable',
+        };
+        return (
+          <span className={`text-xs font-bold px-3 py-1.5 rounded-full border ${
+            row.status === 'Opportunity' ? 'bg-emerald-100 text-emerald-800 border-emerald-300' :
+            row.status === 'Warning' ? 'bg-red-100 text-red-800 border-red-300' :
+            'bg-slate-100 text-slate-600 border-slate-300'
+          }`}>
+            {row.status === 'Warning' && <i className="fas fa-exclamation-triangle mr-1"></i>}
+            {row.status === 'Opportunity' && <i className="fas fa-arrow-down mr-1"></i>}
+            {t(statusKey[row.status] ?? 'statusStable')}
+          </span>
+        );
+      }
     }
   ];
 
@@ -414,23 +421,29 @@ export default function TradingTerminalPage() {
       {/* FILTER TABS */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex gap-2">
-          {(['all', 'Warning', 'Opportunity', 'Stable'] as const).map(f => (
-            <button
-              key={f}
-              type="button"
-              onClick={() => setFilter(f)}
-              className={`px-4 py-2 rounded-lg text-xs font-bold transition-colors ${
-                filter === f
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
-              }`}
-            >
-              {f === 'all'
-                ? `${t('all')} (${items.length})`
-                : `${t(f)} (${items.filter(i => i.status === f).length})`
-              }
-            </button>
-          ))}
+          {(['all', 'Warning', 'Opportunity', 'Stable'] as const).map(f => {
+            const labelKey: Record<string, string> = {
+              all: 'all',
+              Warning: 'statusWarning',
+              Opportunity: 'statusOpportunity',
+              Stable: 'statusStable',
+            };
+            const count = f === 'all' ? items.length : items.filter(i => i.status === f).length;
+            return (
+              <button
+                key={f}
+                type="button"
+                onClick={() => setFilter(f)}
+                className={`px-4 py-2 rounded-lg text-xs font-bold transition-colors ${
+                  filter === f
+                    ? 'bg-indigo-600 text-white'
+                    : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+                }`}
+              >
+                {t(labelKey[f])} ({count})
+              </button>
+            );
+          })}
         </div>
         <div className="flex items-center gap-1">
           <span className="text-xs text-slate-400 font-semibold mr-1">{t('period')}:</span>

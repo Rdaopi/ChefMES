@@ -89,7 +89,7 @@ export const getTerminalData = async (req: any, res: Response) => {
   const days = Number(req.query.days) || 0;
 
   try {
-    let query = supabase
+    let historyQuery = supabase
       .from('ingredient_price_history')
       .select('*')
       .eq('user_id', userId)
@@ -98,38 +98,46 @@ export const getTerminalData = async (req: any, res: Response) => {
     if (days > 0) {
       const cutoff = new Date();
       cutoff.setDate(cutoff.getDate() - days);
-      query = query.gte('invoice_date', cutoff.toISOString().split('T')[0]);
+      historyQuery = historyQuery.gte('invoice_date', cutoff.toISOString().split('T')[0]);
     }
 
-    const { data: history, error } = await query;
+    const [{ data: history, error }, { data: currentPrices }] = await Promise.all([
+      historyQuery,
+      supabase
+        .from('standard_ingredients')
+        .select('id, current_price')
+        .eq('user_id', userId)
+        .gt('current_price', 0)
+    ]);
 
     if (error) throw error;
     if (!history?.length) return res.json([]);
 
-    // Group by standard_id
+    // Build id → current_price map from standard_ingredients directly
+    const currentPriceMap = new Map(
+      (currentPrices || []).map((i: any) => [i.id, Number(i.current_price)])
+    );
+
+    // Group history by standard_id
     const grouped = new Map<string, any[]>();
-    history.forEach(row => {
+    history.forEach((row: any) => {
       if (!grouped.has(row.standard_id)) grouped.set(row.standard_id, []);
       grouped.get(row.standard_id)!.push(row);
     });
 
     const terminalItems = Array.from(grouped.entries()).map(([standardId, rows]) => {
-      const first = rows[0];                        // oldest invoice — contract price
-      const last = rows[rows.length - 1];           // most recent invoice
-      const previous = rows.length > 1
-        ? rows[rows.length - 2]
-        : rows[0];                                  // second-to-last for short-term trend
+      const first = rows[0];
+      const last = rows[rows.length - 1];
+      const previous = rows.length > 1 ? rows[rows.length - 2] : rows[0];
 
-      const contractPrice = Number(first.price);    // oldest known price
-      const livePrice = Number(last.target_price);  // current_price from standard_ingredients
-      const prevPrice = Number(previous.price);     // previous invoice price
+      const contractPrice = Number(first.price);
+      const livePrice = currentPriceMap.get(standardId) ?? Number(last.price);
+      const prevPrice = Number(previous.price);
 
-      // Long-term trend: contract → live (for status classification)
       const longTermPercent = contractPrice > 0
         ? ((livePrice - contractPrice) / contractPrice) * 100
         : 0;
 
-      // Short-term trend: previous invoice → latest invoice (for trend badge)
       const shortTermPercent = prevPrice > 0
         ? ((Number(last.price) - prevPrice) / prevPrice) * 100
         : 0;
@@ -138,39 +146,27 @@ export const getTerminalData = async (req: any, res: Response) => {
         shortTermPercent > 1 ? 'up' :
         shortTermPercent < -1 ? 'down' : 'stable';
 
-      // Status based on long-term trend
       const status =
         longTermPercent > 5 ? 'Warning' :
         longTermPercent < -5 ? 'Opportunity' : 'Stable';
 
-      // Total delta savings across all invoices
-      const totalDeltaSavings = rows.reduce(
-        (sum, r) => sum + Number(r.delta_savings || 0), 0
-      );
-
       return {
         id: standardId,
-        ingredient: last.ingredient_name,
-        uom: last.unit_of_measure,
+        ingredient: first.ingredient_name,
+        uom: first.unit_of_measure,
         supplier: last.supplier_name,
-
         contractPrice: parseFloat(contractPrice.toFixed(4)),
         livePrice: parseFloat(livePrice.toFixed(4)),
-
-        // Short-term trend badge
         trend: `${shortTermPercent > 0 ? '+' : ''}${shortTermPercent.toFixed(1)}%`,
         trendPercent: parseFloat(shortTermPercent.toFixed(2)),
         trendDirection,
-
-        // Long-term classification
         longTermPercent: parseFloat(longTermPercent.toFixed(2)),
+        totalDeltaSavings: parseFloat(
+          rows.reduce((sum: number, r: any) => sum + Number(r.delta_savings || 0), 0).toFixed(2)
+        ),
         status,
-
-        // Savings tracking
-        totalDeltaSavings: parseFloat(totalDeltaSavings.toFixed(2)),
-
         lastUpdated: last.invoice_date,
-        priceHistory: rows.map(r => ({
+        priceHistory: rows.map((r: any) => ({
           date: r.invoice_date,
           price: Number(r.price),
           supplier: r.supplier_name
