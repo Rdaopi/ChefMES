@@ -111,17 +111,33 @@ export default function MenuEngineeringPage() {
         </button>
       </header>
 
-      {/* STATISTICHE (Rimaste invariate) */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <p className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-1">{t('avgFoodCost') || 'Food Cost Medio'}</p>
-          <p className="text-2xl font-black text-slate-800">28.4% <span className="text-emerald-500 text-sm ml-2"><i className="fas fa-arrow-down"></i> 1.2%</span></p>
-        </div>
-        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <p className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-1">{t('itemsAtRisk') || 'Piatti a rischio'}</p>
-          <p className="text-2xl font-black text-red-600">{menuItems.filter(m => m.status === 'Dog').length}</p>
-        </div>
-      </div>
+      {/* STATISTICHE */}
+      {(() => {
+        const pricedItems = menuItems.filter(m => m.sellingPrice > 0);
+        const avgFoodCost = pricedItems.length > 0
+          ? pricedItems.reduce((sum, m) => sum + (m.productionCost / m.sellingPrice) * 100, 0) / pricedItems.length
+          : null;
+        const atRisk = menuItems.filter(m => m.status === 'Dog').length;
+
+        return (
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+              <p className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-1">{t('avgFoodCost') || 'Food Cost Medio'}</p>
+              <p className="text-2xl font-black text-slate-800">
+                {isLoading
+                  ? '—'
+                  : avgFoodCost === null
+                    ? '—'
+                    : `${avgFoodCost.toFixed(1)}%`}
+              </p>
+            </div>
+            <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+              <p className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-1">{t('itemsAtRisk') || 'Piatti a rischio'}</p>
+              <p className="text-2xl font-black text-red-600">{isLoading ? '—' : atRisk}</p>
+            </div>
+          </div>
+        );
+      })()}
       
       {/* TABELLA */}
       <div className="bg-white shadow-sm rounded-2xl border border-slate-200 flex flex-col w-full overflow-hidden">

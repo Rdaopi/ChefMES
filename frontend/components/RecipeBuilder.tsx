@@ -177,6 +177,9 @@ export default function RecipeBuilder({ mode, existingData, onSave, isSaving }: 
     await onSave(payload);
   };
 
+  const allZeroPrice = availableItems.filter(i => i.type === 'standard').length > 0 &&
+    availableItems.filter(i => i.type === 'standard').every(i => Number(i.current_price ?? 0) === 0);
+
   if (isLoading) return (
     <div className="p-8 text-center text-slate-900">
       <i className="fas fa-spinner fa-spin mr-2"></i> {t('loadingBuilder')}
@@ -186,6 +189,17 @@ export default function RecipeBuilder({ mode, existingData, onSave, isSaving }: 
   return (
     <div className="flex-1 flex flex-col h-full bg-slate-50 overflow-y-auto">
       <div className="max-w-4xl mx-auto w-full p-8">
+
+        {/* ZERO-PRICE WARNING BANNER */}
+        {allZeroPrice && (
+          <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-3">
+            <i className="fas fa-exclamation-triangle text-amber-500 mt-0.5"></i>
+            <div>
+              <p className="text-sm font-bold text-amber-800">{t('noPricedIngredients')}</p>
+              <p className="text-xs text-amber-600 mt-0.5">{t('noPricedIngredientsHint')}</p>
+            </div>
+          </div>
+        )}
 
         {/* HEADER */}
         <div className="flex justify-between items-center mb-8">
@@ -333,7 +347,9 @@ export default function RecipeBuilder({ mode, existingData, onSave, isSaving }: 
                         <optgroup label={t('baseIngredientsGroup')}>
                           {availableItems.filter(i => i.type === 'standard').map(ing => (
                             <option key={ing.id} value={ing.id}>
-                              {ing.name} ({ing.unit_of_measure}) — €{Number(ing.current_price || 0).toFixed(4)}/{ing.unit_of_measure}
+                              {Number(ing.current_price ?? 0) === 0
+                                ? `${ing.name} ⚠️ ${t('missingPrice')}`
+                                : `${ing.name} (${ing.unit_of_measure}) — €${Number(ing.current_price).toFixed(4)}/${ing.unit_of_measure}`}
                             </option>
                           ))}
                         </optgroup>
@@ -362,9 +378,15 @@ export default function RecipeBuilder({ mode, existingData, onSave, isSaving }: 
                     <div className="w-12 text-sm font-bold text-slate-900 text-center">{uom}</div>
 
                     <div className="w-24 text-right">
-                      <span className={`text-sm font-black ${lineCost > 0 ? 'text-emerald-600' : 'text-slate-900'}`}>
-                        {lineCost > 0 ? `€ ${lineCost.toFixed(3)}` : '—'}
-                      </span>
+                      {item.item_id && lineCost === 0 ? (
+                        <span className="text-sm font-black text-amber-500" title={t('missingPrice')}>
+                          €0.0000 ⚠️
+                        </span>
+                      ) : (
+                        <span className={`text-sm font-black ${lineCost > 0 ? 'text-emerald-600' : 'text-slate-900'}`}>
+                          {lineCost > 0 ? `€ ${lineCost.toFixed(3)}` : '—'}
+                        </span>
+                      )}
                     </div>
 
                     <button
@@ -389,6 +411,12 @@ export default function RecipeBuilder({ mode, existingData, onSave, isSaving }: 
                 </span>
                 <span className="text-2xl font-black text-slate-800">€ {liveCost.toFixed(3)}</span>
               </div>
+              {liveCost === 0 && recipeItems.some(r => r.item_id) && (
+                <p className="text-xs text-amber-500 mt-2">
+                  <i className="fas fa-info-circle mr-1"></i>
+                  {t('zeroCostHint')}
+                </p>
+              )}
               {mode === 'dish' && sellingPrice && (
                 <div className="flex justify-between items-center mt-2">
                   <span className="text-sm font-bold text-slate-900 uppercase tracking-wider">{t('estimatedMargin')}</span>

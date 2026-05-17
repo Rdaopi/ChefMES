@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { LanguageSwitcher, useTranslations } from '@/components/LanguageProvider';
 
@@ -9,7 +10,13 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 export default function Sidebar() {
   const { t } = useTranslations();
+  const router = useRouter();
   const [alertCount, setAlertCount] = useState(0);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push('/login');
+  };
 
   useEffect(() => {
     const fetchAlertCount = async () => {
@@ -81,6 +88,13 @@ export default function Sidebar() {
                 </div>
             </div>
             <LanguageSwitcher />
+            <button
+                onClick={handleLogout}
+                className="mt-3 w-full flex items-center px-4 py-2 text-sm text-slate-400 hover:bg-slate-800 hover:text-white rounded-xl transition-colors"
+            >
+                <i className="fas fa-sign-out-alt w-6"></i>
+                <span className="font-medium">{t('logout')}</span>
+            </button>
         </div>
     </aside>
   );
