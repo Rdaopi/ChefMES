@@ -237,7 +237,7 @@ export const uploadInvoice = async (req: any, res: Response) => {
       }
     }
 
-    // 9. Update prices — only if this invoice is the most recent
+    // 9. Update prices unconditionally — duplicate file check above prevents re-import
     const priceUpdates = resolvedLines
       .filter(r => r.standardId != null && r.line.unitPrice && r.conversionFactor > 0)
       .map(r => ({
@@ -252,8 +252,7 @@ export const uploadInvoice = async (req: any, res: Response) => {
           .from('standard_ingredients')
           .update({ current_price: update.current_price, last_updated: update.last_updated })
           .eq('id', update.id)
-          .eq('user_id', userId)
-          .lte('last_updated', invoiceDate);
+          .eq('user_id', userId);
         if (priceErr) console.error('Price update error for', update.id, priceErr);
       }
     }
